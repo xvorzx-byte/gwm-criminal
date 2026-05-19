@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skill Guide — ร้อยสำนัก</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0d0b;--bg2:#161310;--bg3:#1d1915;--bg4:#252018;
+  --line:rgba(255,200,80,.1);--line2:rgba(255,200,80,.06);
+  --gold:#c8963c;--gold-l:#e8b55a;
+  --red:#d94040;--green:#4caf78;--blue:#4a9edd;--purple:#9b6dd6;--crit:#f0c040;
+  --fg:#e8dcc8;--fg2:#a89878;--fg3:#6a5a40;
+  --thai:'Noto Sans Thai',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--thai);min-height:100vh}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.back{text-decoration:none;color:var(--fg3);font-size:12px;padding:6px 12px;border:1px solid var(--line);border-radius:7px;background:var(--bg3);transition:.15s;white-space:nowrap}
+.back:hover{color:var(--fg2);border-color:rgba(255,200,80,.2)}
+.tb-title{font-size:15px;font-weight:700;color:var(--fg);display:flex;align-items:center;gap:8px}
+.tb-meta{font-size:11px;color:var(--fg3)}
+.tb-sep{color:var(--fg3);opacity:.4}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.view-tog{display:inline-flex;background:var(--bg3);border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.vbtn{font-size:11px;font-weight:700;padding:6px 12px;border:none;background:transparent;color:var(--fg3);cursor:pointer;font-family:var(--thai);transition:.15s;display:flex;align-items:center;gap:5px;border-right:1px solid var(--line)}
+.vbtn:last-child{border-right:none}
+.vbtn:hover{color:var(--fg2)}
+.vbtn.on{background:rgba(200,150,60,.15);color:var(--gold-l)}
+
+.rec-btn{font-size:12px;font-weight:700;padding:7px 14px;border:1px solid rgba(255,200,50,.3);background:rgba(255,200,50,.1);color:var(--crit);border-radius:7px;cursor:pointer;font-family:var(--thai);transition:.15s;display:flex;align-items:center;gap:5px}
+.rec-btn:hover{background:rgba(255,200,50,.18)}
+.rec-btn.on{background:rgba(155,109,214,.2);border-color:rgba(155,109,214,.5);color:#c49ee8}
+
+/* Filter bar */
+.filterbar{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--line2);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none}
+#search{width:100%;padding:8px 12px 8px 34px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;color:var(--fg);font-family:var(--thai);font-size:13px;outline:none;transition:.15s}
+#search:focus{border-color:rgba(255,200,80,.25)}
+
+.role-pills{display:flex;gap:5px;flex-wrap:wrap}
+.rpill{font-size:11px;font-weight:700;padding:7px 14px;border-radius:7px;border:1px solid var(--line);background:var(--bg3);color:var(--fg3);cursor:pointer;font-family:var(--thai);transition:.15s;display:flex;align-items:center;gap:4px}
+.rpill:hover{color:var(--fg2);border-color:rgba(255,200,80,.2)}
+.rpill[data-r=""].on{background:rgba(200,150,60,.2);border-color:rgba(200,150,60,.4);color:var(--gold-l)}
+.rpill[data-r="dps"].on{background:rgba(217,64,64,.2);border-color:rgba(217,64,64,.4);color:#e87070}
+.rpill[data-r="tank"].on{background:rgba(74,158,221,.2);border-color:rgba(74,158,221,.4);color:#7ab8e8}
+.rpill[data-r="heal"].on{background:rgba(76,175,120,.2);border-color:rgba(76,175,120,.4);color:#72d498}
+.rpill[data-r="support"].on{background:rgba(155,109,214,.2);border-color:rgba(155,109,214,.4);color:#c49ee8}
+
+/* Highlight chips */
+.kwbar{padding:8px 16px;background:var(--bg);border-bottom:1px solid var(--line2);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.kw-lbl{font-size:10px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.1em;margin-right:4px}
+.kwchip{font-size:11px;font-weight:600;padding:4px 11px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--fg3);cursor:pointer;font-family:var(--thai);transition:.12s}
+.kwchip:hover{border-color:rgba(155,109,214,.3);color:var(--fg2)}
+.kwchip.on{background:rgba(155,109,214,.18);border-color:rgba(155,109,214,.45);color:#c49ee8}
+
+/* Recommend stat panel */
+.rec-panel{background:var(--bg2);border-bottom:1px solid var(--line);padding:12px 16px;display:none;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.rec-panel.show{display:flex}
+.rec-field{display:flex;flex-direction:column;gap:3px}
+.rec-label{font-size:9px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.08em}
+.rec-input{width:90px;padding:6px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;color:var(--fg);font-family:var(--mono);font-size:12px;font-weight:600;outline:none}
+.rec-input:focus{border-color:rgba(255,200,80,.3)}
+.rec-role-sel{padding:6px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;color:var(--fg);font-family:var(--thai);font-size:12px;outline:none}
+.rec-hint{font-size:10px;color:var(--fg3);margin-left:auto;align-self:center;line-height:1.5;text-align:right}
+
+/* Info bar */
+.infobar{padding:8px 16px;display:flex;align-items:center;gap:8px}
+.count{font-size:11px;color:var(--fg3)}
+.sort-sel{margin-left:auto;font-size:11px;padding:5px 10px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;color:var(--fg2);font-family:var(--thai);outline:none}
+
+/* Grid */
+.sk-grid{padding:0 16px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:1100px){.sk-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.sk-grid{grid-template-columns:1fr}}
+
+.sk{border:1px solid var(--line);border-radius:8px;background:var(--bg2);overflow:hidden;transition:border-color .15s}
+.sk:hover{border-color:rgba(200,150,60,.25)}
+.sk.hl-kw{border-color:rgba(155,109,214,.45);background:rgba(155,109,214,.04)}
+.sk.hl-r1{border-color:rgba(232,112,112,.45)}
+.sk.hl-r2{border-color:rgba(240,192,64,.4)}
+.sk.hl-r3{border-color:rgba(76,175,120,.4)}
+
+.sk-head{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
+.sk-idx{font-size:10px;color:var(--fg3);font-family:var(--mono);min-width:18px;flex-shrink:0}
+.sk-name{font-size:13px;font-weight:700;color:var(--fg);flex:1;line-height:1.2}
+.sk-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-flex;align-items:center;gap:2px}
+.sk-cd{font-size:10px;color:var(--fg3);font-family:var(--mono);display:flex;align-items:center;gap:3px}
+
+.tier-r1{background:rgba(232,112,112,.2);border:1px solid rgba(232,112,112,.4);color:#e87070}
+.tier-r2{background:rgba(240,192,64,.15);border:1px solid rgba(240,192,64,.35);color:var(--crit)}
+.tier-r3{background:rgba(76,175,120,.15);border:1px solid rgba(76,175,120,.35);color:var(--green)}
+.tier-kw{background:rgba(155,109,214,.15);border:1px solid rgba(155,109,214,.4);color:#c49ee8}
+
+.sk-tags{padding:0 12px 8px 36px;display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;font-weight:700;line-height:1.3}
+.tag-plain{background:var(--bg4);border-color:var(--line2);color:var(--fg3)}
+
+.sk-reason{padding:0 12px 8px 36px;font-size:10px;color:var(--green);font-family:var(--mono);line-height:1.5}
+.sk-warn{padding:0 12px 8px 36px;font-size:10px;color:#e87070;font-family:var(--mono);line-height:1.5}
+
+.sk-body{display:none;border-top:1px solid var(--line2);padding:10px 14px 12px 36px}
+.sk.open .sk-body{display:block}
+.sk-desc{font-size:11px;line-height:1.8;color:var(--fg2)}
+.sk-ctr{font-size:11px;color:#e87070;margin-top:5px}
+.sk-cmb{font-size:11px;color:var(--green)}
+.sk-stats{font-size:10px;color:var(--fg3);margin-top:5px;font-family:var(--mono)}
+
+/* Compact view */
+.sk-grid.compact{grid-template-columns:1fr;gap:3px}
+.sk-grid.compact .sk{border-radius:6px}
+.sk-grid.compact .sk-head{padding:6px 10px}
+.sk-grid.compact .sk-tags{padding:0 10px 5px 32px}
+.sk-grid.compact .sk-reason,.sk-grid.compact .sk-warn{padding:0 10px 5px 32px}
+
+/* Table view */
+.sk-grid.table{display:block;padding:0 16px 40px}
+.sk-grid.table .sk{border-radius:0;border-bottom:1px solid var(--line2);border-left:none;border-right:none;border-top:none;background:transparent}
+.sk-grid.table .sk:first-child{border-top:1px solid var(--line2)}
+.sk-grid.table .sk-head{padding:8px 0;gap:12px}
+.sk-grid.table .sk-tags{padding:0 0 6px 30px}
+
+/* Tag colors */
+.t-CC{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.4);color:#a78bfa}
+.t-ทุบโล่{background:rgba(249,115,22,.15);border-color:rgba(249,115,22,.4);color:#f97316}
+.t-ระเบิด{background:rgba(232,112,112,.15);border-color:rgba(232,112,112,.4);color:#e87070}
+.t-AoE{background:rgba(251,146,60,.15);border-color:rgba(251,146,60,.4);color:#fb923c}
+.t-ฮีล{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.4);color:#4ade80}
+.t-บัฟ{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.4);color:#fbbf24}
+.t-ดีบัฟ{background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa}
+.t-ปลดCC{background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4);color:#34d399}
+.t-Mobility{background:rgba(240,171,252,.15);border-color:rgba(240,171,252,.4);color:#f0abfc}
+.t-ลดดาเมจ{background:rgba(122,184,232,.15);border-color:rgba(122,184,232,.4);color:#7ab8e8}
+.t-Counter{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.4);color:#fbbf24}
+.t-Launch{background:rgba(192,132,252,.15);border-color:rgba(192,132,252,.4);color:#c084fc}
+.t-โล่{background:rgba(56,189,248,.15);border-color:rgba(56,189,248,.4);color:#38bdf8}
+.t-สะท้อน{background:rgba(232,121,249,.15);border-color:rgba(232,121,249,.4);color:#e879f9}
+.t-คงกระพัน{background:rgba(163,230,53,.15);border-color:rgba(163,230,53,.4);color:#a3e635}
+.t-Iframe{background:rgba(34,211,238,.15);border-color:rgba(34,211,238,.4);color:#22d3ee}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back" href="/calc">← Calculator</a>
+  <div class="tb-title">📖 Skill Guide</div>
+  <span class="tb-sep">—</span>
+  <div class="tb-meta">หมวดร้อยสำนัก · 48 สกิล · เลือกได้ 1 ต่อสนาม</div>
+  <div class="tb-right">
+    <div class="view-tog">
+      <button class="vbtn on" id="vbtn-cards" onclick="setView('cards')">📇 Cards</button>
+      <button class="vbtn" id="vbtn-compact" onclick="setView('compact')">≡ Compact</button>
+      <button class="vbtn" id="vbtn-table" onclick="setView('table')">▦ Table</button>
+    </div>
+    <button class="rec-btn" id="rec-btn" onclick="toggleRec()">⚡ Recommend</button>
+  </div>
+</div>
+
+<div class="filterbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search" placeholder="ค้นหาสกิล..." oninput="render()">
+  </div>
+  <div class="role-pills">
+    <button class="rpill on" data-r="" onclick="setRole(this)">ทั้งหมด</button>
+    <button class="rpill" data-r="dps" onclick="setRole(this)">⚔ DPS</button>
+    <button class="rpill" data-r="tank" onclick="setRole(this)">🛡 Tank</button>
+    <button class="rpill" data-r="heal" onclick="setRole(this)">💚 Heal</button>
+    <button class="rpill" data-r="support" onclick="setRole(this)">🌀 Support</button>
+  </div>
+</div>
+
+<div class="kwbar">
+  <span class="kw-lbl">Highlight</span>
+  <button class="kwchip" data-kw="ทุบโล่" onclick="toggleKW(this)">ทุบโล่</button>
+  <button class="kwchip" data-kw="CC" onclick="toggleKW(this)">ควบคุมแรง</button>
+  <button class="kwchip" data-kw="ระเบิด" onclick="toggleKW(this)">ระเบิด</button>
+  <button class="kwchip" data-kw="AoE" onclick="toggleKW(this)">AoE</button>
+  <button class="kwchip" data-kw="ลดดาเมจ" onclick="toggleKW(this)">ลดดาเมจ</button>
+  <button class="kwchip" data-kw="บัฟ" onclick="toggleKW(this)">บัฟ</button>
+  <button class="kwchip" data-kw="ฮีล" onclick="toggleKW(this)">ฮีล</button>
+  <button class="kwchip" data-kw="ปลดCC" onclick="toggleKW(this)">ปลดควบคุม</button>
+  <button class="kwchip" data-kw="Mobility" onclick="toggleKW(this)">เคลื่อนที่</button>
+  <button class="kwchip" data-kw="Counter" onclick="toggleKW(this)">โต้กลับ</button>
+  <button class="kwchip" data-kw="Launch" onclick="toggleKW(this)">ลอยตัว</button>
+</div>
+
+<div class="rec-panel" id="rec-panel">
+  <div class="rec-field">
+    <span class="rec-label">Role ของฉัน</span>
+    <select class="rec-role-sel" id="rec-role" onchange="onRoleChange()">
+      <option value="dps">⚔ DPS</option>
+      <option value="tank">🛡 Tank</option>
+      <option value="heal">💚 Healer</option>
+    </select>
+  </div>
+  <div class="rec-field" id="rf-atk">
+    <span class="rec-label">ATK</span>
+    <input class="rec-input" id="r-atk" type="number" value="5000" oninput="render()">
+  </div>
+  <div class="rec-field" id="rf-acc">
+    <span class="rec-label">แม่นยำ</span>
+    <input class="rec-input" id="r-acc" type="number" value="900" oninput="render()">
+  </div>
+  <div class="rec-field" id="rf-crit">
+    <span class="rec-label">คริ</span>
+    <input class="rec-input" id="r-crit" type="number" value="1200" oninput="render()">
+  </div>
+  <div class="rec-field" id="rf-def" style="display:none">
+    <span class="rec-label">DEF</span>
+    <input class="rec-input" id="r-def" type="number" value="5000" oninput="render()">
+  </div>
+  <div class="rec-field" id="rf-hp" style="display:none">
+    <span class="rec-label">HP</span>
+    <input class="rec-input" id="r-hp" type="number" value="60000" oninput="render()">
+  </div>
+  <div class="rec-hint">ระบบจะ rank สกิลที่เหมาะกับ stat<br>ของคุณมากที่สุดก่อน</div>
+</div>
+
+<div class="infobar">
+  <span class="count" id="count"></span>
+  <select class="sort-sel" id="sort" onchange="render()">
+    <option value="default">เรียง: ค่าเริ่มต้น</option>
+    <option value="score">เรียง: คะแนน</option>
+    <option value="cd-asc">เรียง: CD น้อย→มาก</option>
+    <option value="cd-desc">เรียง: CD มาก→น้อย</option>
+    <option value="name">เรียง: ชื่อ</option>
+  </select>
+</div>
+
+<div class="sk-grid" id="sklist"></div>
+
+<script>
+const SKILLS = [
+  {id:1, name:'หมึกทลายแผ่นดิน',  role:'dps',     cd:15, tags:['ระเบิด','CC','เดี่ยว'],
+   stats:['ATK','แม่นยำ'], sc:{atk:2},
+   desc:'ดาเมจ 37,105 (น้ำ)|vs มอนสเตอร์ +400%|สถานะตาย +150%|ลดแม่นยำ 40%',
+   ctr:'ใช้กับ DPS hit rate สูง', cmb:'CC ก่อน'},
+  {id:2, name:'ระขังทองคงกระพัน', role:'tank',    cd:55, tags:['เดี่ยว','ลดดาเมจ','สะท้อน'],
+   stats:['DEF','HP'], sc:{def:3,hp:2},
+   desc:'ลดดาเมจตัวเอง 45%|สะท้อนดาเมจ 35%/8วิ|ลดความเร็ว 35%',
+   ctr:'ดีช่วงรับ burst', cmb:'คู่กับ Healer'},
+  {id:3, name:'จันทร์เหมันต์ดุจเดียว', role:'dps', cd:18, tags:['ระเบิด','สะสมพลัง','AoE'],
+   stats:['ATK','พลังคริ'], sc:{atk:3,crit:1},
+   desc:'สูงสุด 41,878 (ทอง)|สะสมพลัง 4 ระดับ|AoE 13×4',
+   ctr:'ยิ่งสะสมนานยิ่งดี', cmb:'คู่กับสกิล immobilize'},
+  {id:4, name:'ทวนสายฟ้าฟาด',     role:'dps',     cd:18, tags:['ระเบิด','ระยะไกล','AoE'],
+   stats:['ATK','พลังคริ'], sc:{atk:3},
+   desc:'3,615–43,026 (สายฟ้า)|เพิกเฉยลด 20-70%|AoE 25×5',
+   ctr:'ระยะไกล ปลอดภัย', cmb:'buff ATK ก่อน charge'},
+  {id:5, name:'แขนอรหันต์',        role:'dps',     cd:19, tags:['เดี่ยว','เคลื่อนที่','ลด CD'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:2},
+   desc:'ต่อเนื่อง 18,329 (กายภาพ)|GCD 1.3วิ|วงกลม 20',
+   ctr:'Mobility สูง หนี CC ได้', cmb:'ลด CD สกิลอื่น'},
+  {id:6, name:'ทำนายฟ้าดิน',       role:'support', cd:12, tags:['กลุ่ม','สุ่มผล','บัฟ'],
+   stats:['HP','พลังสำนัก'], sc:{hp:1},
+   desc:'สุ่ม 8 แบบ|โชคดีมาก 20%|โชคดี 65%|โชคร้าย 15%',
+   ctr:'ผลไม่แน่นอน', cmb:'ใช้เปิดตัว'},
+  {id:7, name:'ไฟสวรรค์พิชิตอัสนี', role:'dps',   cd:24, tags:['ระเบิด','CC','AoE'],
+   stats:['ATK','พลังคริ','เจาะเกราะ'], sc:{atk:3},
+   desc:'หมุนพัน 6,885|กวาดเปลวไฟ 22,029|ระเบิดกระบี่ 26,504|ล้ม 1วิ',
+   ctr:'interrupt cast ศัตรู', cmb:'ช่วงศัตรู cast สกิลใหญ่'},
+  {id:8, name:'วิชาวานร',           role:'support', cd:3,  tags:['เดี่ยว','บัฟ','passive'],
+   stats:['HP','DEF','ความเร็ว'], sc:{hp:2},
+   desc:'ฮีล HP 5%+301|โลหะพลัง +5%|บล็อก +145|ลดดาเมจสกิล -15%|ความเร็ว +7%',
+   ctr:'—', cmb:'เลือก buff ตาม role'},
+  {id:9, name:'ท่าปราบพยัคฆ์',     role:'tank',    cd:30, tags:['เดี่ยว','บัฟ','ยั่วยุ'],
+   stats:['HP','DEF'], sc:{hp:1},
+   desc:'ดาเมจ vs มอนสเตอร์ +15%|รับดาเมจ +8%|ความแค้น +150%/15วิ',
+   ctr:'PVE เท่านั้น', cmb:'คู่ Healer เพื่อ sustain'},
+  {id:10, name:'กระจกฟ้าล่องเงา',  role:'support', cd:24, tags:['เดี่ยว','โล่','บัฟ'],
+   stats:['HP'], sc:{hp:3},
+   desc:'โล่ 30% HP สูงสุด/8วิ|CD 2ช่วง 50วิ',
+   ctr:'HP สูง → โล่หนา', cmb:'ใช้ก่อนรับ burst'},
+  {id:11, name:'มุกกระทบจานหยก',   role:'dps',     cd:20, tags:['เดี่ยว','CC','AoE'],
+   stats:['ATK','คริ','พลังคริ'], sc:{atk:2,crit:3},
+   desc:'ลูกแก้วเล็ก 25,196|ลูกแก้วใหญ่ 23,406|มึนงง 0.4วิ|เป้าลอย +100%',
+   ctr:'Juggle combo', cmb:'คู่กับสกิล Launch'},
+  {id:12, name:'ดัชนีเสียงวิหค',   role:'dps',     cd:15, tags:['เดี่ยว','ทุบโล่','ลด CD'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:1},
+   desc:'ทุบโล่ 36% HP|ลดต้านทาน +35%|ลด CD 6วิ',
+   ctr:'vs Tank/Bruiser', cmb:'ตามด้วยสกิล ATK สูง'},
+  {id:13, name:'เบญจธาตุกลับสู่ศูนย์รวม', role:'support', cd:30, tags:['กลุ่ม','บัฟ','HP'],
+   stats:['HP','พลังสำนัก'], sc:{hp:3},
+   desc:'เพิ่ม HP สูงสุด 6%+1,800/1800วิ|AoE วงกลม 20',
+   ctr:'—', cmb:'ใช้ก่อนสนาม'},
+  {id:14, name:'หยิ่งรู้ไร้สิ้นสุด', role:'dps',   cd:30, tags:['เดี่ยว','บัฟ','คริ'],
+   stats:['คริ','พลังคริ'], sc:{crit:3},
+   desc:'คริ +132|ดาเมจคริ +6.6%/1800วิ',
+   ctr:'—', cmb:'ใช้ทุกสนาม — buff ถาวร'},
+  {id:15, name:'พลังกระบี่เมืองร้าง', role:'tank', cd:25, tags:['เดี่ยว','โล่','ลดดาเมจ'],
+   stats:['DEF','HP'], sc:{def:2,hp:3},
+   desc:'โล่ 13,922|ลดดาเมจ 50%/3วิ|รีเฟรช 3ครั้ง',
+   ctr:'sustain ยาว', cmb:'คู่กับ self-heal'},
+  {id:16, name:'วิชาดาบกลับใจ',    role:'dps',     cd:15, tags:['ต่อเนื่อง','AoE','กลางอากาศ'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:3},
+   desc:'ดาบยมทูต 19,901 (ทอง)|ไม่ถูก CC +50%|เพิกเฉยลด 30%',
+   ctr:'ยิ่งไม่ถูก CC ยิ่งดี', cmb:'ใช้ช่วงไม่ถูกรบกวน'},
+  {id:17, name:'เทพมารคำราม',       role:'dps',     cd:25, tags:['ต่อเนื่อง','CC','วงกลม'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:2},
+   desc:'ต่อเนื่อง 30,118|มึนงง 1วิ|ตัวเองมึนงง 0.75วิ',
+   ctr:'ระวัง self-stun', cmb:'ใช้เปิดตัว'},
+  {id:18, name:'ทุ่มสุดตัว - ปีก', role:'dps',     cd:8,  tags:['กลุ่ม','CC','ระยะ'],
+   stats:['ATK','แม่นยำ'], sc:{atk:1,acc:3},
+   desc:'ขนนก 3,443|เรียกคืน 15,145 (ไฟ)|แม่นยำ 1ครั้ง/100% 2ครั้ง/50%',
+   ctr:'CD สั้น spam ได้', cmb:'hit rate สูง'},
+  {id:19, name:'สี่ธาตุล้วนว่างเปล่า', role:'tank', cd:24, tags:['เดี่ยว','ลดดาเมจ','บล็อก'],
+   stats:['DEF','HP'], sc:{def:3,hp:2},
+   desc:'ลดดาเมจ 20%|vs CC+คงกระพัน -70%|บล็อก 30ครั้ง/15วิ',
+   ctr:'Counter burst DPS', cmb:'เปิดก่อนรับ burst'},
+  {id:20, name:'เมามายลืมโลก',      role:'heal',    cd:4800, tags:['เดี่ยว','ฮีล','emergency'],
+   stats:['HP'], sc:{hp:1},
+   desc:'ยาเร่งด่วน 3ชุด/4วิ|CD 1ชั่วโมง 20นาที',
+   ctr:'—', cmb:'emergency เท่านั้น'},
+  {id:21, name:'พายุหมุนโลกกันตร์', role:'dps',     cd:13, tags:['ต่อเนื่อง','ทุบโล่','ลด CD'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:2},
+   desc:'หมุน 1,377/วิ (สายฟ้า)|ทุบโล่ 5%/วิ สูงสุด 6วิ|ลด CD 8วิ',
+   ctr:'ทุบโล่ต่อเนื่อง', cmb:'คู่กับสกิลหนักหลังทุบโล่'},
+  {id:22, name:'เส้นทางพายุหิมะ',  role:'dps',     cd:18, tags:['ต่อเนื่อง','กำบัง','ลดความเร็ว'],
+   stats:['ATK','DEF'], sc:{atk:2},
+   desc:'กำแพงลม 23,234|ลดความเร็ว 50%/3วิ|ต้านระยะ 25%/10วิ',
+   ctr:'vs DPS ระยะไกล', cmb:'สกัดกั้น'},
+  {id:23, name:'คาถาเปลี่ยนชีวิต', role:'dps',     cd:24, tags:['ระเบิด','โล่','ตัวเอง'],
+   stats:['HP','ATK'], sc:{atk:2,hp:2},
+   desc:'ใช้ HP 20%|โล่ 35% HP ปัจจุบัน|ระเบิด 33,181 (ไฟ)',
+   ctr:'HP สูงยิ่งดี', cmb:'ใช้ช่วง HP สูง'},
+  {id:24, name:'ล่องหนไร้ตัวตน',   role:'tank',    cd:24, tags:['เดี่ยว','ลดดาเมจ','Iframe'],
+   stats:['DEF','HP'], sc:{def:2},
+   desc:'ไม่เกิดผล 1ครั้งหลังใช้|หลังถูกโจมตี 3ครั้ง/6วิ',
+   ctr:'Iframe แท้ 3 hit', cmb:'ช่วง burst ศัตรู'},
+  {id:25, name:'พิงภูผาเหล็ก',      role:'tank',    cd:0,  tags:['เดี่ยว','CC','สะสม'],
+   stats:['DEF','HP'], sc:{def:2,hp:2},
+   desc:'ดาเมจ 13,769 (ดิน)|ลดดาเมจ 10-20% stack 2ครั้ง|สะสม 5ครั้ง',
+   ctr:'ยิ่ง stack ยิ่งดี', cmb:'spam เพื่อ stack'},
+  {id:26, name:'คลื่นลมหิมะ',       role:'dps',     cd:25, tags:['กลุ่ม','คงกระพัน','CC'],
+   stats:['ATK','DEF'], sc:{atk:3},
+   desc:'ดาเมจ 73,143 (น้ำแข็ง)|ลดความเร็ว 40%/4วิ|ลดดาเมจ 25-64%',
+   ctr:'ศัตรูรวมกลุ่ม', cmb:'หลัง pull/CC'},
+  {id:27, name:'เทพสวรรค์คุ้มภัย', role:'support', cd:3,  tags:['passive','คุ้มครอง','บัฟ'],
+   stats:['HP','พลังสำนัก'], sc:{hp:1},
+   desc:'คุ้มครองทีม 1คน|กลุ่ม 2คน|ระยะ 20',
+   ctr:'—', cmb:'passive เปิดตลอด'},
+  {id:28, name:'ใจคมดาบ',           role:'dps',     cd:36, tags:['เดี่ยว','อัญเชิญ','passive'],
+   stats:['ATK','คริ'], sc:{atk:2,crit:2},
+   desc:'ร่ายพัน 6,230|ระเบิด 24,893/15วิ|ต่อเนื่อง 34,291/24วิ|vs มอนสเตอร์ +30%',
+   ctr:'background DPS', cmb:'ปล่อยแล้วใช้สกิลอื่น'},
+  {id:29, name:'ไม้โจมดี',          role:'tank',    cd:19, tags:['กลุ่ม','ลดดาเมจ','คงกระพัน'],
+   stats:['DEF','HP','ข่มสำนัก'], sc:{def:3,hp:2},
+   desc:'ตั้งดาบลด 60%|ป้องสำนัก +8%|โจมตี 47,328 (ไฟ)|ลดดาเมจ 17-48%',
+   ctr:'รับ burst + เพิ่มป้องสำนัก', cmb:'counter punish'},
+  {id:30, name:'ทลายโกลาหล',        role:'dps',     cd:22, tags:['ระเบิด','ลดดาเมจ','Mobility'],
+   stats:['ATK','DEF'], sc:{atk:2},
+   desc:'ลดดาเมจ 30% + ต้านระยะ 50%|ระเบิด 7,745–18,587 (ไฟ)',
+   ctr:'ต้านระยะขณะเดิน', cmb:'dash เข้าหา + ระเบิด'},
+  {id:31, name:'ไม้ดีสุนัข - แทง', role:'dps',     cd:20, tags:['เดี่ยว','CC','คงกระพัน'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:3},
+   desc:'สูงสุด 30,979|เพิกเฉยลด DEF 50%|ลดดาเมจตัวเอง 35%',
+   ctr:'ทะลุ DEF ศัตรู', cmb:'คู่กับ ไม้ดีสุนัข-สะดุด'},
+  {id:32, name:'ไม้ดีสุนัข - สะดุด', role:'dps',   cd:20, tags:['กลุ่ม','CC','คงกระพัน'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:3},
+   desc:'AoE 23,234|เพิกเฉยลด 50%|ลดดาเมจตัวเอง 35%',
+   ctr:'AoE knock', cmb:'คู่กับ ไม้ดีสุนัข-แทง'},
+  {id:33, name:'ย่างก้าวฝุ่นฟุ้ง',  role:'dps',     cd:18, tags:['ต่อเนื่อง','คงกระพัน','AoE'],
+   stats:['ATK','คริ'], sc:{atk:2,crit:1},
+   desc:'บินขึ้น 4,647|ต่อเนื่อง 4,647/วิ/5วิ|ลดดาเมจ 10%',
+   ctr:'หลีก ground CC', cmb:'air combo'},
+  {id:34, name:'ปัดผนึกดั้งกำแพงเหล็ก', role:'tank', cd:25, tags:['เดี่ยว','ลดดาเมจ','กำบัง'],
+   stats:['DEF','HP'], sc:{def:3,hp:2},
+   desc:'5.5วิ|ลดดาเมจ 60%|วงกลม 5',
+   ctr:'wall สกัดทีมศัตรู', cmb:'วางใกล้ Healer'},
+  {id:35, name:'ดักจับนกกระจอก',   role:'tank',    cd:13, tags:['เดี่ยว','โต้กลับ','Counter'],
+   stats:['DEF','HP'], sc:{def:2},
+   desc:'โต้กลับ 4วิ|จับได้ ลด 80%+CC 2.6วิ|ไม่โต้กลับ ลด CD 6วิ',
+   ctr:'จับ DPS rush เข้ามา', cmb:'ตาม CC ลดดาเมจ'},
+  {id:36, name:'วิชากระบี่นึงรัก',  role:'dps',     cd:20, tags:['ระเบิด','เคลื่อนที่','ทุบโล่'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:2},
+   desc:'ท่า 2: 15,145 ทุบโล่ 48% HP|AoE 8×3',
+   ctr:'ทุบโล่สูง vs Tank', cmb:'ตามด้วยสกิล ATK สูง'},
+  {id:37, name:'บุปผาเคียงใจ',      role:'support', cd:45, tags:['กลุ่ม','บัฟ','รวมพลัง'],
+   stats:['พลังสำนัก','ข่มสำนัก'], sc:{def:1,hp:1},
+   desc:'รวมพลัง 110,971|ลดดาเมจทั้งคู่ 65%|ลดดงกระพัน 60%|CD ทีม 45วิ',
+   ctr:'ปกป้องทีมช่วง burst', cmb:'คู่กับ DPS AoE'},
+  {id:38, name:'ฝ่ามือแดนมนุษย์',  role:'dps',     cd:20, tags:['เดี่ยว','ต่อเนื่อง','ทุบโล่'],
+   stats:['ATK','เจาะเกราะ','แม่นยำ'], sc:{atk:2,acc:2},
+   desc:'ต่อเนื่อง 26,487|สุดท้าย 10,301|ปิดโล่ 42% HP|ลดความเร็ว 30%',
+   ctr:'vs Tank/Bruiser', cmb:'ลด DEF หลังปิดโล่'},
+  {id:39, name:'พันยอดสะบั้นเมฆา', role:'dps',     cd:19, tags:['เดี่ยว','ต่อเนื่อง','ลดความเร็ว'],
+   stats:['ATK','ความเร็ว'], sc:{atk:1},
+   desc:'ดาเมจ 2,926/0.7วิ|ลดความเร็ว 38%/2วิ',
+   ctr:'ชะลอ DPS ความเร็วสูง', cmb:'CC ล็อกเป้า'},
+  {id:40, name:'อัสนีบาต',          role:'dps',     cd:18, tags:['เดี่ยว','ระเบิด','CC'],
+   stats:['ATK','เจาะเกราะ','แม่นยำ'], sc:{atk:3,acc:1},
+   desc:'ควงดาบ 47,328|กระเด็น 1.3วิ|ลด CD เมื่อไม่ถูกโจมตี 10วิ',
+   ctr:'Burst ช่วง Healer CD', cmb:'buff ATK ก่อน cast'},
+  {id:41, name:'ลมกรรโชก',          role:'dps',     cd:30, tags:['กลุ่ม','ต่อเนื่อง','ดีบัฟ'],
+   stats:['ATK','เจาะเกราะ'], sc:{atk:3},
+   desc:'ลม 61,957|+65% vs ไม่ CC+ดงกระพัน|ลดรับ 65%|CD ทีม 30วิ',
+   ctr:'ศัตรูไม่มี CC', cmb:'ใช้หลัง CC ศัตรูหมด'},
+  {id:42, name:'ฝ่ามือพิชิตมังกร', role:'tank',    cd:14, tags:['เดี่ยว','ลดดาเมจ','ควบคุม'],
+   stats:['DEF','HP','ข่มสำนัก'], sc:{def:3,hp:2},
+   desc:'เป้าหลัก 7,194|ลดดาเมจ 70%/6วิ|ปล่อยไม่ได้ CD ลดเหลือ 6วิ',
+   ctr:'สกัด burst DPS', cmb:'ป้องกัน Healer'},
+  {id:43, name:'สู้รบเคียงข้างกัน', role:'support', cd:30, tags:['เดี่ยว','ปลดCC','ฮีล'],
+   stats:['HP','พลังสำนัก'], sc:{hp:2},
+   desc:'KD 1วิ|ฮีล 6,989|ลดดาเมจสิ่งไม่ใช่มนุษย์ 70%',
+   ctr:'ปลด CC เพื่อน', cmb:'คู่ Tank ที่ถูก CC บ่อย'},
+  {id:44, name:'สะบั้นดีชั่ว - ทมิฬ', role:'dps', cd:15, tags:['เดี่ยว','บัฟ','Launch'],
+   stats:['ATK','คริ'], sc:{atk:2,crit:2},
+   desc:'ดาเมจ +20%×2|กลางอากาศ: มาเจ็บ 70%/6วิ + ดาเมจ 20%×3',
+   ctr:'เป้าลอยยิ่งดาเมจสูง', cmb:'คู่กับ Launch/Juggle'},
+  {id:45, name:'สะบั้นดีชั่ว - ขาว', role:'tank',  cd:24, tags:['เดี่ยว','ลดดาเมจ','Counter'],
+   stats:['DEF','HP'], sc:{def:3},
+   desc:'ลดดาเมจ 20%|สกิลระเบิด -70%/12วิ|บล็อก 3ครั้ง',
+   ctr:'Counter สกิลระเบิด', cmb:'ก่อนรับ burst'},
+  {id:46, name:'เก้าฟ้ายกขึ้น',     role:'dps',     cd:40, tags:['เดี่ยว','Mobility','บัฟ'],
+   stats:['ATK','ความเร็ว','คริ'], sc:{atk:1},
+   desc:'บิน 8.7วิ|ดาเมจ 14,244|ลด CD 1.5วิ/ครั้ง สูงสุด 6วิ',
+   ctr:'หนี burst ได้', cmb:'Reset + ลด CD สกิลอื่น'},
+  {id:47, name:'ร่มแดงพิฆาต',       role:'dps',     cd:15, tags:['ระเบิด','AoE','เคลื่อนที่'],
+   stats:['ATK','พลังคริ','คริ'], sc:{atk:2,crit:2},
+   desc:'ลม 3,860/วิ|ร่ม 8วิ|ซากุระ 10,291|ถูก CC เพิ่ม CD 10วิ',
+   ctr:'อ่อนแอถ้าถูก CC ระหว่าง cast', cmb:'คู่กับ CC-immune'},
+  {id:48, name:'มังกรเหินน้ำคำราม', role:'tank',    cd:18, tags:['ระเบิด','CC','ปล่อยตัว'],
+   stats:['DEF','HP','ข่มสำนัก'], sc:{def:2,hp:2},
+   desc:'น้ำใหญ่ 14,293|ปลดลอยตัว +100%|ลดดาเมจ 60%/3.6วิ|ต้องการ ≤7วา + ไม่ถูก CC',
+   ctr:'ป้องกัน Juggle', cmb:'ปลด CC ก่อน cast'},
+];
+
+let activeRole = '';
+let activeKWs  = new Set();
+let recMode    = false;
+let viewMode   = 'cards';
+
+const TAG_CLS = new Set(['CC','ทุบโล่','ระเบิด','AoE','ฮีล','บัฟ','ดีบัฟ',
+  'ปลดCC','Mobility','ลดดาเมจ','Counter','Launch','โล่','สะท้อน','คงกระพัน','Iframe']);
+
+function tagHTML(t){
+  const cls = TAG_CLS.has(t) ? 't-'+t : 'tag-plain';
+  return `<span class="tag ${cls}">${t}</span>`;
+}
+
+function calcScore(s){
+  if(!recMode) return {total:0,reasons:[],warnings:[]};
+  const role = document.getElementById('rec-role').value;
+  const v = id => parseFloat(document.getElementById(id)?.value)||0;
+  const sc = s.sc||{};
+  let total=0, reasons=[], warnings=[];
+
+  if(role==='dps'){
+    const atk=v('r-atk'), acc=v('r-acc'), crit=v('r-crit');
+    if(sc.atk){const t=atk>9000?3:atk>6000?2:atk>3000?1:0;total+=sc.atk*t;if(t>=2)reasons.push('ATK '+atk.toLocaleString());else if(!t)warnings.push('ATK ต่ำ');}
+    if(sc.acc){const t=acc>900?3:acc>600?2:acc>300?1:0;total+=sc.acc*t;if(t>=2)reasons.push('แม่นยำ '+acc);else if(!t)warnings.push('แม่นยำต่ำ');}
+    if(sc.crit){const t=crit>700?3:crit>400?2:crit>200?1:0;total+=sc.crit*t;if(t>=2)reasons.push('คริ '+crit);else if(!t)warnings.push('คริต่ำ');}
+  } else if(role==='tank'){
+    const def=v('r-def'), hp=v('r-hp');
+    if(sc.def){const t=def>8000?3:def>5000?2:def>2000?1:0;total+=sc.def*t;if(t>=2)reasons.push('DEF '+def.toLocaleString());else if(!t)warnings.push('DEF ต่ำ');}
+    if(sc.hp){const t=hp>80000?3:hp>50000?2:hp>30000?1:0;total+=sc.hp*t;if(t>=2)reasons.push('HP '+hp.toLocaleString());}
+  } else {
+    const hp=v('r-hp');
+    if(sc.hp){const t=hp>80000?3:hp>50000?2:hp>30000?1:0;total+=sc.hp*t;if(t>=2)reasons.push('HP '+hp.toLocaleString());}
+  }
+
+  const fit={dps:['dps'],tank:['tank'],heal:['heal','support']}[role]||[];
+  if(fit.includes(s.role)) total+=2;
+
+  return {total,reasons,warnings};
+}
+
+function render(){
+  const q    = document.getElementById('search').value.toLowerCase();
+  const sort = document.getElementById('sort').value;
+
+  let list = SKILLS.filter(s=>{
+    if(activeRole && s.role!==activeRole) return false;
+    if(q && !s.name.toLowerCase().includes(q) &&
+            !s.desc.toLowerCase().includes(q) &&
+            !s.tags.join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).map(s=>{
+    const scored  = calcScore(s);
+    const kwMatch = activeKWs.size>0 && s.tags.some(t=>activeKWs.has(t));
+    return {...s, ...scored, kwMatch};
+  });
+
+  if(sort==='score' || recMode){
+    list.sort((a,b)=>(b.kwMatch?1:0)-(a.kwMatch?1:0)||b.total-a.total);
+  } else if(sort==='cd-asc')  list.sort((a,b)=>a.cd-b.cd);
+  else if(sort==='cd-desc')   list.sort((a,b)=>b.cd-a.cd);
+  else if(sort==='name')      list.sort((a,b)=>a.name.localeCompare(b.name,'th'));
+  else if(activeKWs.size>0)   list.sort((a,b)=>(b.kwMatch?1:0)-(a.kwMatch?1:0));
+
+  document.getElementById('count').textContent = `แสดง ${list.length} / ${SKILLS.length} สกิล`;
+
+  const badgeFor = (s)=>{
+    if(s.kwMatch) return `<span class="sk-badge tier-kw">★</span>`;
+    if(!recMode) return '';
+    if(s.total>=10) return `<span class="sk-badge tier-r1">🔥 #1</span>`;
+    if(s.total>=7)  return `<span class="sk-badge tier-r2">⭐ ดี</span>`;
+    if(s.total>=4)  return `<span class="sk-badge tier-r3">✓ ดี</span>`;
+    return '';
+  };
+
+  const hlCls = (s)=>{
+    if(s.kwMatch) return 'hl-kw';
+    if(recMode){
+      if(s.total>=10) return 'hl-r1';
+      if(s.total>=7)  return 'hl-r2';
+      if(s.total>=4)  return 'hl-r3';
+    }
+    return '';
+  };
+
+  const grid = document.getElementById('sklist');
+  grid.className = 'sk-grid' + (viewMode==='cards'?'':' '+viewMode);
+
+  grid.innerHTML = list.map(s=>`
+    <div class="sk ${hlCls(s)}" id="sk${s.id}">
+      <div class="sk-head" onclick="toggle(${s.id})">
+        <span class="sk-idx">${String(s.id).padStart(2,'0')}</span>
+        <span class="sk-name">${s.name}</span>
+        ${badgeFor(s)}
+        <span class="sk-cd">⏱ ${s.cd} s</span>
+      </div>
+      <div class="sk-tags">${s.tags.map(tagHTML).join('')}</div>
+      ${s.reasons?.length&&(recMode||s.kwMatch)?`<div class="sk-reason">✓ ${s.reasons.join(' · ')}</div>`:''}
+      ${s.warnings?.length&&(recMode||s.kwMatch)?`<div class="sk-warn">⚠ ${s.warnings[0]}</div>`:''}
+      <div class="sk-body">
+        <div class="sk-desc">${s.desc.replace(/\|/g,'<br>')}</div>
+        ${s.ctr&&s.ctr!=='—'?`<div class="sk-ctr">⚡ Counter: ${s.ctr}</div>`:''}
+        ${s.cmb?`<div class="sk-cmb">🔗 Combo: ${s.cmb}</div>`:''}
+        ${s.stats?.length?`<div class="sk-stats">Stat หลัก: ${s.stats.join(', ')}</div>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggle(id){
+  document.getElementById('sk'+id)?.classList.toggle('open');
+}
+
+function setRole(btn){
+  activeRole = btn.dataset.r;
+  document.querySelectorAll('.rpill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  render();
+}
+
+function toggleKW(btn){
+  const kw = btn.dataset.kw;
+  if(activeKWs.has(kw)){activeKWs.delete(kw);btn.classList.remove('on');}
+  else{activeKWs.add(kw);btn.classList.add('on');}
+  render();
+}
+
+function setView(v){
+  viewMode = v;
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('vbtn-'+v).classList.add('on');
+  render();
+}
+
+function toggleRec(){
+  recMode = !recMode;
+  document.getElementById('rec-btn').classList.toggle('on', recMode);
+  document.getElementById('rec-panel').classList.toggle('show', recMode);
+  if(recMode) document.getElementById('sort').value='score';
+  else document.getElementById('sort').value='default';
+  onRoleChange();
+  render();
+}
+
+function onRoleChange(){
+  const role = document.getElementById('rec-role').value;
+  ['atk','acc','crit'].forEach(f=>document.getElementById('rf-'+f).style.display=role==='dps'?'':'none');
+  ['def','hp'].forEach(f=>document.getElementById('rf-'+f).style.display=role!=='dps'?'':'none');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

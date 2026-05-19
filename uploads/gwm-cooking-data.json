@@ -1,0 +1,242 @@
+{
+  "ingredients": {
+    "6":  { "id": 6,  "name": "ปลาสดระดับหนึ่ง",             "category": "ปลา",       "price": 0,   "limit": 0,   "source": ["ซื้อขาย", "แยกส่วนผลผลิตตกปลา"] },
+    "8":  { "id": 8,  "name": "ข้าวน้ำ",                      "category": "ธัญพืช",   "price": 38,  "limit": 300, "source": ["ร้านค้า"] },
+    "10": { "id": 10, "name": "อาหารสดจากแม่น้ำระดับสอง",     "category": "ปลา",       "price": 0,   "limit": 0,   "source": ["ซื้อขาย", "แยกส่วนผลผลิตตกปลา"], "station_level": 6 },
+    "18": { "id": 18, "name": "อาหารสดจากแม่น้ำระดับสาม",     "category": "ปลา",       "price": 0,   "limit": 0,   "source": ["ซื้อขาย", "แยกส่วนผลผลิตตกปลา"], "station_level": 11 },
+    "20": { "id": 20, "name": "ดอกไม้แห่งสี่ฤดู",             "category": "ดอกไม้",   "price": 38,  "limit": 300, "source": ["ร้านค้า"] },
+    "23": { "id": 23, "name": "เนื้อสัตว์ปีก",                "category": "เนื้อสัตว์","price": 38,  "limit": 300, "source": ["ร้านค้า"] },
+    "27": { "id": 27, "name": "ข้าวสาลี",                     "category": "ธัญพืช",   "price": 38,  "limit": 300, "source": ["ร้านค้า"] },
+    "33": { "id": 33, "name": "ใบอ่อนและยอดใหม่",             "category": "ผัก",       "price": 38,  "limit": 300, "source": ["ร้านค้า"] },
+    "36": { "id": 36, "name": "ผักและผลไม้",                  "category": "ผัก",       "price": 38,  "limit": 300, "source": ["ร้านค้า"] },
+    "37": { "id": 37, "name": "เครื่องปรุง",                  "category": "เครื่องปรุง","price": 38, "limit": 500, "source": ["ร้านค้า"] },
+    "40": { "id": 40, "name": "เนื้อสัตว์",                   "category": "เนื้อสัตว์","price": 38,  "limit": 300, "source": ["ร้านค้า"] }
+  },
+
+  "cooking_methods": {
+    "ผัด":     { "id": "stir_fry",  "name": "ผัด",    "icon": "fire" },
+    "ตากลม":   { "id": "air_dry",   "name": "ตากลม",  "icon": "wind" },
+    "แช่แข็ง": { "id": "freeze",    "name": "แช่แข็ง","icon": "ice" },
+    "นึ่ง":    { "id": "steam",     "name": "นึ่ง",   "icon": "steam" },
+    "การทอด":  { "id": "fry",       "name": "การทอด", "icon": "lightning" },
+    "การอบ":   { "id": "bake",      "name": "การอบ",  "icon": "stone" }
+  },
+
+  "recipes": [
+    {
+      "id": 1,  "name": "ปลาราดซอสเปรี้ยวหวานซีหู",       "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 2}, {"id": 6,  "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 2,  "name": "ปลาย่างฝออิ้น",                   "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 6,  "qty": 3}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 3,  "name": "ซุปไขกระดูก",                     "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 1}, {"id": 27, "qty": 3}],
+      "batch": 1
+    },
+    {
+      "id": 4,  "name": "นกขมิ้นทอด",                      "station_level": 1,  "method": "ตากลม",
+      "ingredients": [{"id": 23, "qty": 2}, {"id": 37, "qty": 1}, {"id": 27, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 5,  "name": "ปลาเงินแล่สด",                    "station_level": 1,  "method": "แช่แข็ง",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 6,  "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 6,  "name": "ขนมปิ้งถาง",                      "station_level": 1,  "method": "นึ่ง",
+      "ingredients": [{"id": 37, "qty": 2}, {"id": 27, "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 7,  "name": "ซุปปลาหญ้าสี่รส",                 "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 6,  "qty": 1}],
+      "batch": 10
+    },
+    {
+      "id": 8,  "name": "ซุปกุ้งห้าสุข",                   "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 10, "qty": 1}],
+      "batch": 10
+    },
+    {
+      "id": 9,  "name": "บะหมี่หลิงอิ้น",                  "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 1}, {"id": 8,  "qty": 3}],
+      "batch": 1
+    },
+    {
+      "id": 10, "name": "ปลาโระพา",                         "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 2}, {"id": 8,  "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 11, "name": "น้ำแข็งใสเกล็ดหิมะ",               "station_level": 1,  "method": "แช่แข็ง",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 27, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 12, "name": "ปลาดองเหล้า",                      "station_level": 1,  "method": "ตากลม",
+      "ingredients": [{"id": 6,  "qty": 2}, {"id": 37, "qty": 1}, {"id": 27, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 13, "name": "ไก่ตัมสับชิ้น",                   "station_level": 1,  "method": "แช่แข็ง",
+      "ingredients": [{"id": 37, "qty": 1}, {"id": 23, "qty": 3}],
+      "batch": 1
+    },
+    {
+      "id": 14, "name": "เป็ดย่าง",                         "station_level": 1,  "method": "ตากลม",
+      "ingredients": [{"id": 37, "qty": 2}, {"id": 23, "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 15, "name": "ขนมหูปึ้ง",                        "station_level": 1,  "method": "การทอด",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 8,  "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 16, "name": "ไก่อบ",                            "station_level": 1,  "method": "การอบ",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 23, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 17, "name": "เส้นบะหมี่เปลือกต้นทง",           "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 40, "qty": 1}, {"id": 23, "qty": 1}, {"id": 8,  "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 18, "name": "บะหมี่แดง",                        "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 10, "qty": 1}, {"id": 8,  "qty": 2}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 19, "name": "หม้อไฟแสงอรุณ",                   "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 40, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 20, "name": "ของสดจากป่า",                      "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 1}, {"id": 36, "qty": 3}],
+      "batch": 1
+    },
+    {
+      "id": 21, "name": "ผักดองแตง",                        "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 10, "qty": 1}, {"id": 23, "qty": 1}, {"id": 36, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 22, "name": "หน่อไม้ตุ๋นเหล้า",                "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 27, "qty": 1}, {"id": 36, "qty": 2}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 23, "name": "บะหมี่หน่อไม้ฤดูใบไม้ผลิ",        "station_level": 6,  "method": "ผัด",
+      "ingredients": [{"id": 40, "qty": 1}, {"id": 8,  "qty": 1}, {"id": 36, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 24, "name": "หน่อไม้เปรี้ยวสูตรร้านหลี่",      "station_level": 6,  "method": "ตากลม",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 36, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 25, "name": "ห่อภูเขาทะเล",                    "station_level": 6,  "method": "นึ่ง",
+      "ingredients": [{"id": 10, "qty": 1}, {"id": 6,  "qty": 1}, {"id": 36, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 26, "name": "บะหมี่เม้นจ่อแห่งฉือโจว",         "station_level": 6,  "method": "นึ่ง",
+      "ingredients": [{"id": 40, "qty": 1}, {"id": 8,  "qty": 2}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 27, "name": "ขนมอบกรอบสีเหลือง",               "station_level": 6,  "method": "การอบ",
+      "ingredients": [{"id": 8,  "qty": 2}, {"id": 36, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 28, "name": "ทองคำตุ๋นหยก",                    "station_level": 6,  "method": "การทอด",
+      "ingredients": [{"id": 8,  "qty": 1}, {"id": 27, "qty": 1}, {"id": 36, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 29, "name": "ซี่โครงหมูอบกระเทียม",            "station_level": 6,  "method": "การทอด",
+      "ingredients": [{"id": 37, "qty": 2}, {"id": 40, "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 30, "name": "ซุปปลาปักเป้าหน่ออ้อ",            "station_level": 11, "method": "ผัด",
+      "ingredients": [{"id": 6,  "qty": 1}, {"id": 33, "qty": 1}, {"id": 37, "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 31, "name": "ซุปกุ้งและผักชุน",                "station_level": 11, "method": "ผัด",
+      "ingredients": [{"id": 10, "qty": 1}, {"id": 33, "qty": 2}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 32, "name": "ซุปตงโพ",                          "station_level": 11, "method": "ผัด",
+      "ingredients": [{"id": 33, "qty": 2}, {"id": 36, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 33, "name": "กุ้งผัดหลงจิ้ง",                  "station_level": 1,  "method": "ผัด",
+      "ingredients": [{"id": 10, "qty": 2}, {"id": 33, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 34, "name": "บะหมี่เย็นใบสน",                  "station_level": 11, "method": "แช่แข็ง",
+      "ingredients": [{"id": 8,  "qty": 2}, {"id": 33, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 35, "name": "ปูสด",                             "station_level": 11, "method": "แช่แข็ง",
+      "ingredients": [{"id": 37, "qty": 2}, {"id": 18, "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 36, "name": "ถุงจอหงวน",                        "station_level": 11, "method": "นึ่ง",
+      "ingredients": [{"id": 40, "qty": 1}, {"id": 8,  "qty": 1}, {"id": 20, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 37, "name": "ซาลาเปาไส้ไข่ปู",                 "station_level": 11, "method": "นึ่ง",
+      "ingredients": [{"id": 18, "qty": 1}, {"id": 8,  "qty": 1}, {"id": 20, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 38, "name": "ปลาห่อเม็ดบัว",                   "station_level": 11, "method": "นึ่ง",
+      "ingredients": [{"id": 6,  "qty": 1}, {"id": 8,  "qty": 1}, {"id": 20, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 39, "name": "ขนมไหว้พระจันทร์",                "station_level": 11, "method": "การอบ",
+      "ingredients": [{"id": 8,  "qty": 2}, {"id": 20, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 40, "name": "ใบหยกกรอบ",                       "station_level": 11, "method": "การอบ",
+      "ingredients": [{"id": 8,  "qty": 1}, {"id": 20, "qty": 1}, {"id": 37, "qty": 2}],
+      "batch": 1
+    },
+    {
+      "id": 41, "name": "เป็ดย่างคู่",                     "station_level": 11, "method": "การทอด",
+      "ingredients": [{"id": 23, "qty": 2}, {"id": 20, "qty": 1}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 42, "name": "ขนมดอกบัวสามเซียน",               "station_level": 11, "method": "การทอด",
+      "ingredients": [{"id": 8,  "qty": 1}, {"id": 20, "qty": 2}, {"id": 37, "qty": 1}],
+      "batch": 1
+    },
+    {
+      "id": 43, "name": "ซุปมันปูหกอย่าง",                 "station_level": 11, "method": "ผัด",
+      "ingredients": [{"id": 37, "qty": 3}, {"id": 18, "qty": 1}],
+      "batch": 10
+    }
+  ]
+}

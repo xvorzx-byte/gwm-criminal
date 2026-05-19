@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOJ Calculator v100</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0d0b;--bg2:#161310;--bg3:#1d1915;--bg4:#252018;
+  --line:rgba(255,200,80,0.1);--line2:rgba(255,200,80,0.06);
+  --gold:#c8963c;--gold-l:#e8b55a;
+  --red:#d94040;--green:#4caf78;--orange:#e0823a;
+  --blue:#4a9edd;--purple:#9b6dd6;--crit:#f0c040;--cyan:#3dd6b5;
+  --fg:#e8dcc8;--fg2:#a89878;--fg3:#6a5a40;
+  --mono:'JetBrains Mono',monospace;
+  --thai:'Noto Sans Thai',sans-serif;
+  --zh:'Noto Serif SC',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--thai);min-height:100vh}
+
+/* mode bar */
+.mode-bar{display:flex;align-items:center;gap:0;background:var(--bg2);border-bottom:1px solid var(--line);padding:0 16px}
+.mode-btn{font-size:13px;font-weight:600;padding:12px 20px;border:none;background:transparent;color:var(--fg3);cursor:pointer;font-family:var(--thai);display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;transition:all .15s}
+.mode-btn:hover{color:var(--fg2)}
+.mode-btn.on{color:var(--fg);border-bottom-color:var(--gold)}
+.mode-btn.on.dps{border-bottom-color:var(--red)}
+.mode-btn.on.tank{border-bottom-color:var(--blue)}
+.mode-btn.on.heal{border-bottom-color:var(--green)}
+.mode-panel{display:none}.mode-panel.on{display:block}
+
+/* enemy/attacker bar */
+.top-bar{background:var(--bg2);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-label{font-size:11px;color:var(--fg3);display:flex;align-items:center;gap:3px}
+.tb-stat{font-size:12px;font-weight:600;font-family:var(--mono)}
+.tb-sep{color:var(--fg3);font-size:11px;margin:0 2px}
+.tb-edit{margin-left:auto;font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--fg2);cursor:pointer;font-family:var(--thai)}
+.tb-edit:hover{background:var(--bg3);color:var(--fg)}
+.edit-panel{background:var(--bg2);border-bottom:1px solid var(--line);padding:12px 16px;display:none}
+.edit-panel.open{display:block}
+.eg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.ef label{font-size:10px;color:var(--fg3);display:block;margin-bottom:3px}
+.ef input{font-family:var(--mono);font-size:14px;font-weight:600;padding:5px 8px;background:var(--bg3);border:1px solid var(--line);border-radius:5px;color:var(--fg);width:100%}
+.ef input:focus{outline:none;border-color:var(--gold)}
+
+/* main */
+.main{padding:12px 14px;max-width:900px;margin:0 auto}
+
+/* stat panel */
+.sp{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.sp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sp-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.sp-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--zh);font-size:14px;font-weight:700}
+.icon-red{background:linear-gradient(135deg,#8b1a1a,#c03030);color:#f8d080;border:1px solid rgba(240,160,60,.4)}
+.icon-blue{background:linear-gradient(135deg,#1a3a6b,#2060c0);color:#a0c8f8;border:1px solid rgba(60,120,240,.4)}
+.icon-green{background:linear-gradient(135deg,#1a4a2a,#2a8040);color:#a0f0b0;border:1px solid rgba(60,200,100,.4)}
+.sp-fixed{font-size:10px;color:var(--fg3);background:var(--bg3);border:1px solid var(--line2);border-radius:4px;padding:3px 8px;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px}
+.ig{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:10px
+}
+@media(max-width:900px){.ig{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.ig{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.ig{grid-template-columns:1fr}}
+
+/* Section group label (inline subtitle within .ig) */
+.ig-section{
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:6px;
+  margin-bottom:-2px;
+  padding-bottom:6px;
+  border-bottom:1px dashed var(--line2);
+  font-size:10px;
+  font-weight:700;
+  color:var(--fg3);
+  letter-spacing:.08em;
+  text-transform:uppercase
+}
+.ig-section:first-child{margin-top:0}
+.ig-section-icon{font-size:11px}
+.ig-section-hint{
+  font-size:9px;
+  font-weight:400;
+  color:var(--fg3);
+  text-transform:none;
+  letter-spacing:0;
+  opacity:.7;
+  margin-left:auto
+}
+
+/* Info tooltip (★) — hover/tap to show location hint */
+.fl-info{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  background:rgba(255,200,80,.08);
+  border:1px solid rgba(255,200,80,.18);
+  color:var(--fg3);
+  font-size:9px;
+  font-weight:700;
+  cursor:help;
+  margin-left:3px;
+  font-family:var(--mono);
+  user-select:none;
+  position:relative;
+  vertical-align:middle;
+  transition:.15s
+}
+.fl-info:hover{
+  background:rgba(255,200,80,.18);
+  border-color:rgba(255,200,80,.35);
+  color:var(--gold)
+}
+.fl-info::after{
+  content:attr(data-info);
+  position:absolute;
+  bottom:calc(100% + 6px);
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:6px 10px;
+  font-size:10px;
+  font-weight:400;
+  color:var(--fg2);
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .15s;
+  z-index:1000;
+  letter-spacing:0;
+  text-transform:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.4)
+}
+.fl-info:hover::after{opacity:1}
+.fl-info::before{
+  content:'';
+  position:absolute;
+  bottom:calc(100% + 1px);
+  left:50%;
+  transform:translateX(-50%);
+  border:4px solid transparent;
+  border-top-color:var(--line);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .15s
+}
+.fl-info:hover::before{opacity:1}
+.field{display:flex;flex-direction:column;gap:3px}
+.fl{font-size:11px;color:var(--fg3);display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}
+.fl-name{color:var(--fg2)}
+.fl-note{font-size:10px;color:var(--fg3)}
+.fi{font-family:var(--mono);font-size:16px;font-weight:700;padding:8px 10px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;color:var(--fg);width:100%;transition:all .15s}
+.fi:focus{outline:none;border-color:var(--gold);background:var(--bg4)}
+.fi.good{border-color:rgba(76,175,120,.6);background:rgba(76,175,120,.04)}
+.fi.warn{border-color:rgba(224,130,58,.6);background:rgba(224,130,58,.04)}
+.fi.bad{border-color:rgba(217,64,64,.5);background:rgba(217,64,64,.04)}
+.fh{font-size:10px;min-height:15px;line-height:1.4}
+.fh-good{color:var(--green)}.fh-warn{color:var(--orange)}.fh-bad{color:var(--red)}
+.ms-tag{display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-right:3px}
+.ms-pass{background:rgba(76,175,120,.2);color:var(--green);border:1px solid rgba(76,175,120,.3)}
+.ms-fail{background:rgba(217,64,64,.15);color:#e07070;border:1px solid rgba(217,64,64,.3)}
+
+/* result strip */
+.rs{display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg2);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.rs-item{padding:12px;border-right:1px solid var(--line2);text-align:center}
+.rs-item:last-child{border-right:none}
+.rs-lbl{font-size:10px;color:var(--fg3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.rs-val{font-family:var(--mono);font-size:20px;font-weight:700}
+.rs-sub{font-size:9px;color:var(--fg3);margin-top:2px}
+.v-red{color:var(--red)}.v-gold{color:var(--crit)}.v-green{color:var(--green)}
+.v-blue{color:var(--blue)}.v-purple{color:var(--purple)}.v-cyan{color:var(--cyan)}
+
+/* tabs */
+.tab-bar{display:flex;gap:4px;padding:0 2px}
+.tab-btn{font-size:12px;padding:7px 16px;border-radius:8px 8px 0 0;border:1px solid var(--line);border-bottom:none;background:var(--bg2);color:var(--fg3);cursor:pointer;font-family:var(--thai);display:flex;align-items:center;gap:5px}
+.tab-btn.on{background:var(--bg3);color:var(--fg)}
+.tab-body{background:var(--bg3);border:1px solid var(--line);border-radius:0 8px 8px 8px;padding:12px;margin-bottom:12px}
+.tc{display:none}.tc.on{display:block}
+
+/* checklist */
+.cl-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:7px;margin-bottom:5px;border:1px solid transparent}
+.cl-item.done{background:rgba(76,175,120,.07);border-color:rgba(76,175,120,.2)}
+.cl-item.todo{background:rgba(217,64,64,.07);border-color:rgba(217,64,64,.2)}
+.cl-item.warn{background:rgba(224,130,58,.07);border-color:rgba(224,130,58,.2)}
+.cl-item.info{background:rgba(200,150,60,.05);border-color:rgba(200,150,60,.15)}
+.cl-badge{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.cb-done{background:rgba(76,175,120,.3);color:var(--green)}
+.cb-todo{background:rgba(217,64,64,.3);color:#e07070}
+.cb-warn{background:rgba(224,130,58,.3);color:var(--orange)}
+.cb-info{background:rgba(200,150,60,.2);color:var(--gold)}
+.cl-body{flex:1}
+.cl-title{font-size:12px;font-weight:600;color:var(--fg)}
+.cl-desc{font-size:10px;color:var(--fg3);margin-top:1px;line-height:1.5}
+.cl-val{font-family:var(--mono);font-size:12px;font-weight:700;flex-shrink:0}
+.cv-good{color:var(--green)}.cv-bad{color:#e07070}.cv-warn{color:var(--orange)}
+.cl-footer{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line2);font-size:11px;color:var(--fg3)}
+.cl-pass{font-weight:700;color:var(--fg)}
+
+/* ── Build Tier Card ── */
+.tier-card{
+  background:linear-gradient(135deg, var(--bg2), var(--bg3));
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:14px;
+  align-items:center;
+  position:relative;
+  overflow:hidden
+}
+.tier-card.t-S{border-color:rgba(240,192,64,.5);background:linear-gradient(135deg,rgba(240,192,64,.08),rgba(232,181,90,.04))}
+.tier-card.t-A{border-color:rgba(76,175,120,.4);background:linear-gradient(135deg,rgba(76,175,120,.06),rgba(76,175,120,.02))}
+.tier-card.t-B{border-color:rgba(74,158,221,.3);background:linear-gradient(135deg,rgba(74,158,221,.05),rgba(74,158,221,.02))}
+.tier-card.t-C{border-color:rgba(224,130,58,.3);background:linear-gradient(135deg,rgba(224,130,58,.06),rgba(224,130,58,.02))}
+.tier-card.t-D{border-color:rgba(217,64,64,.35);background:linear-gradient(135deg,rgba(217,64,64,.06),rgba(217,64,64,.02))}
+
+.tier-badge{
+  font-size:36px;
+  font-weight:900;
+  line-height:1;
+  font-family:var(--mono);
+  width:64px;
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  flex-shrink:0
+}
+.t-S .tier-badge{background:linear-gradient(135deg,#f0c040,#c8963c);color:#1a1410;box-shadow:0 0 20px rgba(240,192,64,.3)}
+.t-A .tier-badge{background:linear-gradient(135deg,#4caf78,#2d8a55);color:#fff}
+.t-B .tier-badge{background:linear-gradient(135deg,#4a9edd,#2d6d9a);color:#fff}
+.t-C .tier-badge{background:linear-gradient(135deg,#e0823a,#a85d22);color:#fff}
+.t-D .tier-badge{background:linear-gradient(135deg,#d94040,#8a2525);color:#fff}
+
+.tier-body{display:flex;flex-direction:column;gap:5px;min-width:0}
+.tier-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3)}
+.tier-name{font-size:16px;font-weight:700;color:var(--fg)}
+.t-S .tier-name{color:var(--crit)}
+.t-A .tier-name{color:var(--green)}
+.t-B .tier-name{color:var(--blue)}
+.t-C .tier-name{color:#e0823a}
+.t-D .tier-name{color:var(--red)}
+.tier-summary{font-size:11px;color:var(--fg2);line-height:1.5}
+.tier-progress{
+  height:5px;
+  background:var(--bg);
+  border-radius:3px;
+  overflow:hidden;
+  margin-top:3px
+}
+.tier-progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.t-S .tier-progress-fill{background:linear-gradient(90deg,#f0c040,#e8b55a)}
+.t-A .tier-progress-fill{background:linear-gradient(90deg,#4caf78,#72d498)}
+.t-B .tier-progress-fill{background:linear-gradient(90deg,#4a9edd,#7ab8e8)}
+.t-C .tier-progress-fill{background:linear-gradient(90deg,#e0823a,#f0a045)}
+.t-D .tier-progress-fill{background:linear-gradient(90deg,#d94040,#e87070)}
+
+.tier-score{
+  text-align:right;
+  flex-shrink:0
+}
+.tier-score-val{
+  font-size:28px;
+  font-weight:700;
+  font-family:var(--mono);
+  color:var(--fg);
+  line-height:1
+}
+.tier-score-lbl{
+  font-size:9px;
+  color:var(--fg3);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-top:2px
+}
+
+/* Insights row below tier card */
+.tier-insights{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px
+}
+@media(max-width:600px){.tier-insights{grid-template-columns:1fr}}
+
+.tier-insight{
+  background:var(--bg2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:9px 12px
+}
+.tier-insight.weak{border-left:3px solid var(--red)}
+.tier-insight.strong{border-left:3px solid var(--green)}
+.tier-insight-head{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--fg3);
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:5px
+}
+.tier-insight.weak .tier-insight-head{color:#e87070}
+.tier-insight.strong .tier-insight-head{color:#72d498}
+.tier-insight-list{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  font-size:11px;
+  line-height:1.5
+}
+.tier-insight-item{color:var(--fg2)}
+.tier-insight-item b{color:var(--fg);font-weight:600}
+.cl-remain{font-size:10px;padding:2px 8px;border-radius:5px;background:rgba(224,130,58,.2);color:var(--orange);border:1px solid rgba(224,130,58,.3);font-weight:600}
+.cl-remain.all{background:rgba(76,175,120,.2);color:var(--green);border-color:rgba(76,175,120,.3)}
+
+/* journey */
+.sj-item{background:var(--bg2);border:1px solid var(--line2);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.sj-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sj-name{font-size:13px;font-weight:600;color:var(--fg2)}
+.sj-val{font-family:var(--mono);font-size:18px;font-weight:700}
+.sj-track{position:relative;height:8px;background:rgba(255,255,255,.06);border-radius:4px;margin-bottom:24px}
+.sj-fill{height:100%;border-radius:4px;transition:width .4s}
+.sj-marker{position:absolute;top:-3px;width:2px;height:14px;border-radius:1px;background:rgba(255,255,255,.25)}
+.sj-marker-lbl{position:absolute;top:14px;font-size:9px;color:var(--fg3);transform:translateX(-50%);white-space:nowrap;text-align:center}
+.sj-thumb{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;border:2px solid var(--bg);transform:translateX(-50%)}
+.sj-status{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;margin-left:6px}
+.ss-good{background:rgba(76,175,120,.15);color:var(--green);border:1px solid rgba(76,175,120,.3)}
+.ss-warn{background:rgba(224,130,58,.15);color:var(--orange);border:1px solid rgba(224,130,58,.3)}
+.ss-bad{background:rgba(217,64,64,.15);color:#e07070;border:1px solid rgba(217,64,64,.3)}
+
+/* priority */
+.pr-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;margin-bottom:4px;background:var(--bg2)}
+.pr-rank{font-family:var(--mono);font-size:11px;font-weight:700;width:18px;color:var(--fg3);flex-shrink:0;text-align:center}
+.pr-rank.top{color:var(--gold)}
+.pr-name{font-size:12px;color:var(--fg);flex:1}
+.pr-bw{flex:2;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.pr-b{height:100%;border-radius:3px;transition:width .4s}
+.pr-b-dps{background:linear-gradient(90deg,#8b1a1a,var(--red))}
+.pr-b-tank{background:linear-gradient(90deg,#1a3a6b,var(--blue))}
+.pr-b-heal{background:linear-gradient(90deg,#1a4a2a,var(--green))}
+.pr-b-zero{background:rgba(255,255,255,.08)}
+.pr-gain{font-family:var(--mono);font-size:12px;font-weight:700;width:70px;text-align:right;flex-shrink:0}
+.pr-gain.pos{color:var(--green)}.pr-gain.zero{color:var(--fg3)}
+.pr-pct{font-size:10px;color:var(--fg3);display:block}
+.pr-divider{height:1px;background:var(--line2);margin:8px 0;position:relative}
+.pr-div-lbl{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--fg3);background:var(--bg3);padding:0 8px}
+
+.btn-sm{font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--line);background:var(--bg3);color:var(--fg2);cursor:pointer;font-family:var(--thai)}
+.btn-sm:hover{background:var(--bg4);color:var(--fg)}
+</style>
+</head>
+<body>
+
+<!-- Mode selector -->
+<div class="mode-bar">
+  <button class="mode-btn dps on" onclick="setMode('dps',this)">⚔ DPS</button>
+  <button class="mode-btn tank" onclick="setMode('tank',this)">🛡 Tank / Bruiser</button>
+  <button class="mode-btn heal" onclick="setMode('heal',this)">💚 Healer</button>
+  <a href="/skill" style="font-size:13px;font-weight:600;padding:12px 20px;border:none;background:transparent;color:var(--fg3);cursor:pointer;font-family:var(--thai);display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;text-decoration:none;transition:all .15s" onmouseover="this.style.color='var(--fg2)'" onmouseout="this.style.color='var(--fg3)'">📖 Skill Guide</a>
+</div>
+
+<!-- ════════════════ DPS MODE ════════════════ -->
+<div class="mode-panel on" id="panel-dps">
+  <!-- enemy bar -->
+  <div class="top-bar" id="dps-ebar">
+    <span class="tb-label">🛡 ศัตรู</span>
+    <span class="tb-sep">เกราะ</span><span class="tb-stat" id="de-def">4,294</span>
+    <span class="tb-sep">โล่</span><span class="tb-stat" id="de-sh">2,584</span>
+    <span class="tb-sep">ป้องกันสำนัก</span><span class="tb-stat" id="de-sd">2,838</span>
+    <span class="tb-sep">ต้านธาตุ</span><span class="tb-stat" id="de-er">680</span>
+    <span class="tb-sep">หลบ</span><span class="tb-stat" id="de-bl">773</span>
+    <span class="tb-sep">ลดดาเมจ</span><span class="tb-stat" id="de-dr">2</span><span style="font-size:10px;color:var(--fg3)">%</span>
+    <span class="tb-sep">ต้านคริ</span><span class="tb-stat" id="de-cr">894</span>
+    <button class="tb-edit" onclick="toggleEdit('dps-edit')">แก้ไข ▾</button>
+  </div>
+  <div class="edit-panel" id="dps-edit">
+    <div class="eg">
+      <div class="ef"><label>เกราะ (DEF)</label><input id="de-def-i" type="number" value="4294" oninput="syncBar('dps');updDPS()"></div>
+      <div class="ef"><label>โล่พลังชี</label><input id="de-sh-i" type="number" value="2584" oninput="syncBar('dps');updDPS()"></div>
+      <div class="ef"><label>ป้องกันสำนัก</label><input id="de-sd-i" type="number" value="2838" oninput="syncBar('dps');updDPS()"></div>
+      <div class="ef"><label>ต้านทานธาตุ</label><input id="de-er-i" type="number" value="680" oninput="syncBar('dps');updDPS()"></div>
+      <div class="ef"><label>หลบ</label><input id="de-bl-i" type="number" value="773" oninput="syncBar('dps');updDPS()"></div>
+      <div class="ef"><label>ลดดาเมจ %</label><input id="de-dr-i" type="number" value="2" oninput="syncBar('dps');updDPS()"></div>
+      <div class="ef"><label>ต้านคริ</label><input id="de-cr-i" type="number" value="894" oninput="syncBar('dps');updDPS()"></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="sp">
+      <div class="sp-hd">
+        <div class="sp-title"><div class="sp-icon icon-red">攻</div>STAT ของเรา (DPS)</div>
+        <button class="btn-sm" onclick="resetDPS()">↺ reset</button>
+      </div>
+      <div class="ig">
+        <div class="ig-section"><span class="ig-section-icon">⚔</span><span>โจมตี — Offensive</span><span class="ig-section-hint">คอลัมน์ "โจมตี" ในเกม</span></div>
+        <div class="field"><div class="fl"><span class="fl-name">โจมตี (ATK)</span><span class="fl-info" data-info="ดูในเกม: หน้า stat → คอลัมน์ 'โจมตี' → 'โจมตี' (ใช้ค่าสูงสุดของ range)">★</span></div><input class="fi" id="d-atk" type="number" value="4577" oninput="updDPS()"><div class="fh fh-good">ไม่มี cap · เพิ่มได้เรื่อยๆ</div></div>
+        <div class="field"><div class="fl"><span class="fl-name">เจาะเกราะ</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'เจาะเกราะ' (破防) — ลด DEF ศัตรู">★</span><span class="fl-note" id="d-pen-note"></span></div><input class="fi" id="d-pen" type="number" value="578" oninput="updDPS()"><div class="fh" id="d-pen-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ทำลายโล่</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'ทำลายโล่' (破盾) — ทำลายโล่พลังชี่ของศัตรู">★</span><span class="fl-note" id="d-sb-note"></span></div><input class="fi" id="d-sb" type="number" value="820" oninput="updDPS()"><div class="fh" id="d-sb-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">โจมตีธาตุ</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'โจมตีธาตุ' (元素攻击) — ดาเมจธาตุ ทะลุโล่ตรงๆ">★</span><span class="fl-note" id="d-ea-note"></span></div><input class="fi" id="d-ea" type="number" value="2043" oninput="updDPS()"><div class="fh" id="d-ea-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ข่มสำนัก</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'ข่มสำนัก' (流派克制) — บวกเข้าดาเมจถ้า > ป้องสำนักศัตรู">★</span></div><input class="fi" id="d-sa" type="number" value="774" oninput="updDPS()"></div>
+        <div class="field"><div class="fl"><span class="fl-name">แม่นยำ</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'ความแม่นย่า' (命中) — ลดโอกาส miss/บล็อกของศัตรู">★</span><span class="fl-note" id="d-acc-note"></span></div><input class="fi" id="d-acc" type="number" value="930" oninput="updDPS()"><div class="fh" id="d-acc-h"></div></div>
+
+        <div class="ig-section"><span class="ig-section-icon">💥</span><span>คริติคอล — Critical</span></div>
+        <div class="field"><div class="fl"><span class="fl-name">คริติคอล</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'คริติคอล' (会心) — โอกาสคริ scale ตามค่า">★</span></div><input class="fi" id="d-crit" type="number" value="1368" oninput="updDPS()"><div class="fh" id="d-crit-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ดาเมจคริ %</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'ดาเมจคริติคอล' (会心伤害) — ตัวคูณเมื่อคริ ขั้นต่ำ 150%">★</span></div><input class="fi" id="d-cdmg" type="number" value="175" oninput="updDPS()"><div class="fh" id="d-cdmg-h" style="color:var(--fg3)"></div></div>
+      </div>
+    </div>
+    <div id="dps-tier-mount"></div>
+    <div class="rs" id="dps-rs">
+      <div class="rs-item"><div class="rs-lbl">Physical รอด</div><div class="rs-val v-red" id="d-r-phys-pct">—</div><div class="rs-sub" id="d-r-phys-sub">จาก ATK</div></div>
+      <div class="rs-item"><div class="rs-lbl">Element รอด</div><div class="rs-val v-purple" id="d-r-elem-pct">—</div><div class="rs-sub" id="d-r-elem-sub">จากธาตุ</div></div>
+      <div class="rs-item"><div class="rs-lbl">ทะลุ Block</div><div class="rs-val" id="d-r-block">—</div><div class="rs-sub" id="d-r-blocksub">—</div></div>
+      <div class="rs-item"><div class="rs-lbl">คริสุทธิ</div><div class="rs-val v-gold" id="d-r-critnet">—</div><div class="rs-sub" id="d-r-critnet-sub">—</div></div>
+      <div class="rs-item" id="d-r-balance-card"><div class="rs-lbl">สมดุล</div><div class="rs-val" id="d-r-balance">—</div><div class="rs-sub" id="d-r-balance-sub">—</div></div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn on" onclick="switchTab('dps','checklist',this)">✅ Checklist</button>
+      <button class="tab-btn" onclick="switchTab('dps','journey',this)">🗺 Journey</button>
+      <button class="tab-btn" onclick="switchTab('dps','priority',this)">📊 Priority</button>
+    </div>
+    <div class="tab-body">
+      <div class="tc on" id="dps-checklist"><div id="dps-cl-items"></div><div class="cl-footer"><span>ผ่าน <span class="cl-pass" id="dps-cl-pass">0</span>/5</span><span class="cl-remain" id="dps-cl-rem"></span></div></div>
+      <div class="tc" id="dps-journey"><div id="dps-sj-items"></div></div>
+      <div class="tc" id="dps-priority"><div id="dps-pr-items"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ TANK MODE ════════════════ -->
+<div class="mode-panel" id="panel-tank">
+  <!-- attacker bar -->
+  <div class="top-bar">
+    <span class="tb-label">⚔ ศัตรู (DPS)</span>
+    <span class="tb-sep">ATK</span><span class="tb-stat" id="te-atk">4,577</span>
+    <span class="tb-sep">เจาะเกราะ</span><span class="tb-stat" id="te-pen">578</span>
+    <span class="tb-sep">ทำลายโล่</span><span class="tb-stat" id="te-sb">820</span>
+    <span class="tb-sep">ธาตุ</span><span class="tb-stat" id="te-ea">2,043</span>
+    <span class="tb-sep">แม่นยำ</span><span class="tb-stat" id="te-acc">930</span>
+    <span class="tb-sep">คริ</span><span class="tb-stat" id="te-crit">1,368</span>
+    <button class="tb-edit" onclick="toggleEdit('tank-edit')">แก้ไข ▾</button>
+  </div>
+  <div class="edit-panel" id="tank-edit">
+    <div class="eg">
+      <div class="ef"><label>ATK ศัตรู</label><input id="te-atk-i" type="number" value="4577" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>เจาะเกราะ</label><input id="te-pen-i" type="number" value="578" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>ทำลายโล่</label><input id="te-sb-i" type="number" value="820" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>ข่มสำนัก</label><input id="te-sa-i" type="number" value="774" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>โจมตีธาตุ</label><input id="te-ea-i" type="number" value="2043" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>แม่นยำ</label><input id="te-acc-i" type="number" value="930" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>คริติคอล</label><input id="te-crit-i" type="number" value="1368" oninput="syncBar('tank');updTank()"></div>
+      <div class="ef"><label>ดาเมจคริ %</label><input id="te-cdmg-i" type="number" value="175" oninput="syncBar('tank');updTank()"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+      <button class="btn-sm" style="background:rgba(76,175,120,.2);border-color:rgba(76,175,120,.4);color:var(--green);padding:6px 16px;font-size:12px" onclick="saveTankAttacker()">✓ บันทึกค่าศัตรู</button>
+      <span style="font-size:10px;color:var(--fg3)" id="tank-save-msg"></span>
+    </div>
+  </div>
+  <div class="main">
+    <div class="sp">
+      <div class="sp-hd">
+        <div class="sp-title"><div class="sp-icon icon-blue">守</div>STAT ของเรา (Tank/Bruiser)</div>
+        <button class="btn-sm" onclick="resetTank()">↺ reset</button>
+      </div>
+      <div class="ig">
+        <div class="ig-section"><span class="ig-section-icon">🛡</span><span>ป้องกัน — Defensive</span><span class="ig-section-hint">คอลัมน์ "ป้องกัน" ในเกม</span></div>
+        <div class="field"><div class="fl"><span class="fl-name">HP</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'พื้นฐาน' → 'พลังชีวิต' (生命值)">★</span></div><input class="fi" id="t-hp" type="number" value="124956" oninput="updTank()"><div class="fh fh-good">พลังชีวิตรวม</div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ป้องกัน (DEF)</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ป้องกัน' (防御) — ลด Physical damage">★</span><span class="fl-note" id="t-def-note"></span></div><input class="fi" id="t-def" type="number" value="4294" oninput="updTank()"><div class="fh" id="t-def-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">โล่พลังชี</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'โล่พลังชี่' (气盾) — ดูด ATK ก่อนเข้า HP">★</span><span class="fl-note" id="t-sh-note"></span></div><input class="fi" id="t-sh" type="number" value="2584" oninput="updTank()"><div class="fh" id="t-sh-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ป้องกันสำนัก</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ป้องกันสำนัก' (流派抵御) — กันข่มสำนักของศัตรู">★</span></div><input class="fi" id="t-sd" type="number" value="2838" oninput="updTank()"></div>
+        <div class="field"><div class="fl"><span class="fl-name">ต้านทานธาตุ</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ต้านทานธาตุ' (元素抗性) — ลด Element damage">★</span><span class="fl-note" id="t-er-note"></span></div><input class="fi" id="t-er" type="number" value="680" oninput="updTank()"><div class="fh" id="t-er-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">หลบ (Block)</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'บล็อก' (格挡) — กันการตี ถูกบล็อกยังโดน 50%">★</span><span class="fl-note" id="t-bl-note"></span></div><input class="fi" id="t-bl" type="number" value="773" oninput="updTank()"><div class="fh" id="t-bl-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ลดดาเมจ %</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ลดดาเมจ' (减伤) — ลดดาเมจรวมขั้นสุดท้าย">★</span><span class="fl-note" id="t-dr-note"></span></div><input class="fi" id="t-dr" type="number" value="2" oninput="updTank()"><div class="fh" id="t-dr-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ต้านคริติคอล</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ต้านทานคริติคอล' (会心抗) — ลดโอกาสโดนคริของศัตรู">★</span></div><input class="fi" id="t-cr" type="number" value="894" oninput="updTank()"><div class="fh" id="t-cr-h"></div></div>
+      </div>
+    </div>
+    <div id="tank-tier-mount"></div>
+    <div class="rs">
+      <div class="rs-item"><div class="rs-lbl">ลด Physical</div><div class="rs-val" id="t-r-defpct">—</div><div class="rs-sub" id="t-r-defpct-sub">อัตราลดดาเมจป้องกัน</div></div>
+      <div class="rs-item"><div class="rs-lbl">ลด Element</div><div class="rs-val" id="t-r-erpct">—</div><div class="rs-sub" id="t-r-erpct-sub">อัตราลดดาเมจธาตุ</div></div>
+      <div class="rs-item"><div class="rs-lbl">อัตราบล็อก</div><div class="rs-val" id="t-r-blockpct">—</div><div class="rs-sub" id="t-r-blockpct-sub">หลบได้</div></div>
+      <div class="rs-item" id="t-r-balance-card"><div class="rs-lbl">จุดอ่อนหลัก</div><div class="rs-val" id="t-r-balance">—</div><div class="rs-sub" id="t-r-balance-sub">—</div></div>
+      <div class="rs-item"><div class="rs-lbl">เฉลี่ย/ตี</div><div class="rs-val v-red" id="t-r-dmg">—</div><div class="rs-sub" id="t-r-critsub">—</div></div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn on" onclick="switchTab('tank','checklist',this)">✅ Checklist</button>
+      <button class="tab-btn" onclick="switchTab('tank','journey',this)">🗺 Journey</button>
+      <button class="tab-btn" onclick="switchTab('tank','priority',this)">📊 Priority</button>
+    </div>
+    <div class="tab-body">
+      <div class="tc on" id="tank-checklist"><div id="tank-cl-items"></div><div class="cl-footer"><span>ผ่าน <span class="cl-pass" id="tank-cl-pass">0</span>/6</span><span class="cl-remain" id="tank-cl-rem"></span></div></div>
+      <div class="tc" id="tank-journey"><div id="tank-sj-items"></div></div>
+      <div class="tc" id="tank-priority"><div id="tank-pr-items"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ HEALER MODE ════════════════ -->
+<div class="mode-panel" id="panel-heal">
+  <div class="main">
+    <div class="sp">
+      <div class="sp-hd">
+        <div class="sp-title"><div class="sp-icon icon-green">治</div>STAT ฮีล (Healer)</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn-sm" style="background:rgba(76,175,120,.2);border-color:rgba(76,175,120,.4);color:var(--green)" onclick="saveHeal()">💾 บันทึก</button>
+          <span style="font-size:10px;color:var(--fg3)" id="heal-save-msg"></span>
+          <button class="btn-sm" onclick="resetHeal()">↺ reset</button>
+        </div>
+      </div>
+      <div class="ig">
+        <div class="ig-section"><span class="ig-section-icon">⚕</span><span>การรักษา — Healing</span><span class="ig-section-hint">สูตร: (ATK + โบนัส) × (1 + %โบนัส)</span></div>
+        <div class="field"><div class="fl"><span class="fl-name">โจมตี (ATK)</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'โจมตี' — Healer ใช้ ATK เป็นฐานคำนวณรักษา">★</span></div><input class="fi" id="h-atk" type="number" value="3000" oninput="updHeal()"><div class="fh fh-good">ฐานคำนวณรักษา</div></div>
+        <div class="field"><div class="fl"><span class="fl-name">โบนัสการรักษา</span><span class="fl-info" data-info="ดูในเกม: stat panel → 'โบนัสการรักษา' (治疗强度) — บวกตรงกับ ATK ในสูตรฮีล">★</span><span class="fl-note" id="h-bonus-note"></span></div><input class="fi" id="h-bonus" type="number" value="1000" oninput="updHeal()"><div class="fh" id="h-bonus-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">% โบนัสรักษา</span><span class="fl-info" data-info="ดูในเกม: stat panel → '% โบนัสรักษา' — multiplier คูณท้ายสุด">★</span></div><input class="fi" id="h-pct" type="number" value="0" oninput="updHeal()"><div class="fh" id="h-pct-h" style="color:var(--fg3)"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">คริติคอล</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'โจมตี' → 'คริติคอล' — คริฮีลคูณ ×1.25 ไม่ใช่ ×1.5">★</span></div><input class="fi" id="h-crit" type="number" value="1000" oninput="updHeal()"><div class="fh" id="h-crit-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ตัวคูณสกิล</span><span class="fl-info" data-info="ตัวคูณดาเมจของสกิลฮีลที่จะใช้ — ดูในเกมที่หน้าสกิล (เช่น 1.0, 1.5, 2.4)">★</span></div><input class="fi" id="h-mult" type="number" value="1.0" step="0.01" oninput="updHeal()"><div class="fh fh-good">ดูจากหน้าสกิล</div></div>
+      </div>
+    </div>
+
+    <!-- Defensive Stats Panel (Healer ต้องอยู่รอดด้วย) -->
+    <div class="sp" style="margin-top:10px">
+      <div class="sp-hd">
+        <div class="sp-title"><div class="sp-icon icon-blue">守</div>STAT ป้องกัน</div>
+        <span style="font-size:10px;color:var(--fg3)">Healer ต้องอยู่รอดจึงจะฮีลได้</span>
+      </div>
+      <div class="ig">
+        <div class="ig-section"><span class="ig-section-icon">🛡</span><span>ป้องกัน — Defensive</span><span class="ig-section-hint">Healer อยู่รอด = ทีมรอด</span></div>
+        <div class="field"><div class="fl"><span class="fl-name">HP</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'พื้นฐาน' → 'พลังชีวิต' (生命值)">★</span></div><input class="fi" id="h-hp" type="number" value="80000" oninput="updHeal()"><div class="fh fh-good">พลังชีวิตรวม</div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ป้องกัน (DEF)</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ป้องกัน' (防御) — ลด Physical damage">★</span><span class="fl-note" id="h-def-note"></span></div><input class="fi" id="h-def" type="number" value="3000" oninput="updHeal()"><div class="fh" id="h-def-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">โล่พลังชี</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'โล่พลังชี่' (气盾) — ดูด ATK">★</span><span class="fl-note" id="h-sh-note"></span></div><input class="fi" id="h-sh" type="number" value="1800" oninput="updHeal()"><div class="fh" id="h-sh-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ป้องกันสำนัก</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ป้องกันสำนัก' (流派抵御)">★</span></div><input class="fi" id="h-sd" type="number" value="1500" oninput="updHeal()"></div>
+        <div class="field"><div class="fl"><span class="fl-name">ต้านทานธาตุ</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ต้านทานธาตุ' (元素抗性)">★</span><span class="fl-note" id="h-er-note"></span></div><input class="fi" id="h-er" type="number" value="400" oninput="updHeal()"><div class="fh" id="h-er-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">หลบ (Block)</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'บล็อก' (格挡)">★</span><span class="fl-note" id="h-bl-note"></span></div><input class="fi" id="h-bl" type="number" value="500" oninput="updHeal()"><div class="fh" id="h-bl-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ลดดาเมจ %</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ลดดาเมจ' (减伤)">★</span><span class="fl-note" id="h-dr-note"></span></div><input class="fi" id="h-dr" type="number" value="0" oninput="updHeal()"><div class="fh" id="h-dr-h"></div></div>
+        <div class="field"><div class="fl"><span class="fl-name">ต้านคริติคอล</span><span class="fl-info" data-info="ดูในเกม: คอลัมน์ 'ป้องกัน' → 'ต้านทานคริติคอล' (会心抗)">★</span></div><input class="fi" id="h-cr" type="number" value="500" oninput="updHeal()"><div class="fh" id="h-cr-h"></div></div>
+      </div>
+    </div>
+
+    <div id="heal-tier-mount"></div>
+
+    <!-- Results: Healing -->
+    <div class="rs">
+      <div class="rs-item"><div class="rs-lbl">รักษา/ครั้ง</div><div class="rs-val v-green" id="h-r-heal">—</div><div class="rs-sub">ปกติ</div></div>
+      <div class="rs-item"><div class="rs-lbl">รักษาคริ/ครั้ง</div><div class="rs-val v-gold" id="h-r-crit">—</div><div class="rs-sub">×1.25</div></div>
+      <div class="rs-item"><div class="rs-lbl">เฉลี่ย/ครั้ง</div><div class="rs-val v-cyan" id="h-r-avg">—</div><div class="rs-sub">รวมโอกาสคริ</div></div>
+      <div class="rs-item"><div class="rs-lbl">โอกาสคริรักษา</div><div class="rs-val v-purple" id="h-r-cr">—</div><div class="rs-sub" id="h-r-crsub">—</div></div>
+      <div class="rs-item" id="h-r-cmp-card"><div class="rs-lbl">vs Tank รับดาเมจ</div><div class="rs-val" id="h-r-cmp">—</div><div class="rs-sub" id="h-r-cmpsub">ดูจากแท็บ Tank</div></div>
+    </div>
+
+    <!-- Results: Defense -->
+    <div class="rs" style="margin-top:6px">
+      <div class="rs-item"><div class="rs-lbl">ลด Physical</div><div class="rs-val" id="h-r-defpct">—</div><div class="rs-sub" id="h-r-defpct-sub">อัตราลดดาเมจป้องกัน</div></div>
+      <div class="rs-item"><div class="rs-lbl">ลด Element</div><div class="rs-val" id="h-r-erpct">—</div><div class="rs-sub" id="h-r-erpct-sub">อัตราลดดาเมจธาตุ</div></div>
+      <div class="rs-item"><div class="rs-lbl">อัตราบล็อก</div><div class="rs-val" id="h-r-blockpct">—</div><div class="rs-sub" id="h-r-blockpct-sub">หลบได้</div></div>
+      <div class="rs-item"><div class="rs-lbl">รับดาเมจ/ตี</div><div class="rs-val v-red" id="h-r-incdmg">—</div><div class="rs-sub" id="h-r-incdmg-sub">ถ้าโดน DPS ตี</div></div>
+      <div class="rs-item" id="h-r-survival-card"><div class="rs-lbl">Survival</div><div class="rs-val" id="h-r-survival">—</div><div class="rs-sub" id="h-r-survival-sub">ฮีลตัวเองทันไหม</div></div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn on" onclick="switchTab('heal','checklist',this)">✅ Checklist</button>
+      <button class="tab-btn" onclick="switchTab('heal','journey',this)">🗺 Journey</button>
+      <button class="tab-btn" onclick="switchTab('heal','priority',this)">📊 Priority</button>
+    </div>
+    <div class="tab-body">
+      <div class="tc on" id="heal-checklist"><div id="heal-cl-items"></div><div class="cl-footer"><span>ผ่าน <span class="cl-pass" id="heal-cl-pass">0</span>/9</span><span class="cl-remain" id="heal-cl-rem"></span></div></div>
+      <div class="tc" id="heal-journey"><div id="heal-sj-items"></div></div>
+      <div class="tc" id="heal-priority"><div id="heal-pr-items"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMode='dps';
+let editOpen={};
+
+// ── helpers ──
+function n(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function fmt(v){return Math.round(v).toLocaleString('th');}
+function pct(v){return(v*100).toFixed(1)+'%';}
+function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
+function setFI(id,cls){const el=document.getElementById(id);if(el){el.className='fi';if(cls)el.classList.add(cls);}}
+function setFH(id,html,cls){const el=document.getElementById(id);if(el){el.innerHTML=html;el.className='fh'+(cls?' '+cls:'');}}
+function setRS(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+
+function setMode(mode,btn){
+  currentMode=mode;
+  document.querySelectorAll('.mode-panel').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.mode-btn').forEach(el=>el.classList.remove('on'));
+  document.getElementById('panel-'+mode).classList.add('on');
+  btn.classList.add('on');
+  saveAll();
+}
+function toggleEdit(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.toggle('open');
+}
+function switchTab(mode,tab,btn){
+  const prefix=mode+'-';
+  document.querySelectorAll(`#panel-${mode} .tc`).forEach(el=>el.classList.remove('on'));
+  btn.closest('.tab-body')?.previousElementSibling?.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('on'));
+  document.getElementById(prefix+tab)?.classList.add('on');
+  btn.classList.add('on');
+}
+
+function syncBar(mode){
+  if(mode==='dps'){
+    [['def','de-def'],['sh','de-sh'],['sd','de-sd'],['er','de-er'],['bl','de-bl'],['dr','de-dr'],['cr','de-cr']].forEach(([k,tid])=>{
+      const el=document.getElementById(tid);if(el)el.textContent=(n('de-'+k+'-i')).toLocaleString('th');
+    });
+  } else if(mode==='tank'){
+    [['atk','te-atk'],['pen','te-pen'],['sb','te-sb'],['ea','te-ea'],['acc','te-acc'],['crit','te-crit']].forEach(([k,tid])=>{
+      const el=document.getElementById(tid);if(el)el.textContent=(n('te-'+k+'-i')).toLocaleString('th');
+    });
+  }
+}
+
+// ── DPS compute ──
+function computeDPS(atk,pen,sb,sa,ea,acc,crit,cdmg,e){
+  const defR=Math.max(0,e.def-pen),defP=defR/(defR+2860);
+  let netA=atk,shLoss=0;
+  if(e.sh>0){
+    const t3=e.sh/3;
+    let shBreak;
+    if(sb<t3)         shBreak = sb*2;        // ทำลาย < ⅓ → หัก 2×
+    else if(sb<e.sh)  shBreak = sb*0.5;      // ⅓ ≤ ทำลาย < โล่ → หัก 0.5×
+    else              shBreak = e.sh;        // ทำลาย ≥ โล่ → หักทั้งก้อน
+    const shRemain = Math.max(0, e.sh - shBreak);
+    netA = Math.max(0, atk - shRemain);
+    shLoss = atk - netA;
+  }
+  const scN=Math.max(0,sa-e.sd);
+  const physF=(390+0.317*(netA+scN))*(1-defP)*(1-e.dr/100);
+  const erP=e.er/(e.er+530);
+  const elF=ea*(1-erP)*(1-e.dr/100);
+  const tot=physF+elF;
+
+  // Crit Rate: ต้านคริศัตรู ลด crit chance ของเรา (per image 4 formula)
+  // ลดคริ% = ต้านคริ / (ต้านคริ + คริ) × 50%
+  const critBase   = crit/(crit+713);          // base crit rate from our stat
+  const critReduce = crit>0 ? e.cr/(e.cr+crit)*0.5 : 0;  // % reduce of CRIT CHANCE
+  const critRate   = Math.max(0, critBase - critReduce); // net crit rate
+
+  const cdmgNet=(cdmg/100);                    // crit damage multiplier (no reduction)
+  const totCrit=tot*cdmgNet;
+  const hr=Math.min(1,Math.max(0,(95+143*acc/(acc+713)-144*e.bl/(e.bl+722))/100));
+  const avg=tot*hr*(1-critRate)+totCrit*hr*critRate+tot*0.5*(1-hr);
+  return{physF,elF,tot,totCrit,hr,avg,defP,erP,shLoss,scN,netA,critRate,critReduce,critBase,cdmgNet};
+}
+
+function accCap(bl){const xNeed=(5+144*bl/(bl+722));return xNeed>=143?Infinity:Math.ceil(713*xNeed/(143-xNeed));}
+
+function updDPS(){
+  const s={atk:n('d-atk'),pen:n('d-pen'),sb:n('d-sb'),sa:n('d-sa'),ea:n('d-ea'),acc:n('d-acc'),crit:n('d-crit'),cdmg:n('d-cdmg')||175};
+  const e={def:n('de-def-i'),sh:n('de-sh-i'),sd:n('de-sd-i'),er:n('de-er-i'),bl:n('de-bl-i'),dr:n('de-dr-i'),cr:n('de-cr-i')};
+  const cap=accCap(e.bl);
+  const r=computeDPS(s.atk,s.pen,s.sb,s.sa,s.ea,s.acc,s.crit,s.cdmg,e);
+  const erP=e.er/(e.er+530);
+  const penT=Math.max(0,Math.round(e.def-erP*2860/(1-erP)));
+  const sbMin=e.sh>0?Math.ceil(e.sh/3)+1:0,sbFull=e.sh;  // ⅓+1 = เปลี่ยน zone, sbFull = ทำลายทั้งก้อน
+  const eaT=(()=>{const d=(1-erP)*(1-e.dr/100);return d>0?Math.round(r.physF/d):Infinity;})();
+  const iOver=s.acc>cap,iUnder=s.acc<cap;
+
+  // field hints
+  const pd=penT-s.pen;
+  document.getElementById('d-pen-note').textContent=`(พอดี ${fmt(penT)})`;
+  if(pd>50){setFI('d-pen','bad');setFH('d-pen-h',`ยังขาด ${fmt(pd)} หน่วย`,'fh-bad');}
+  else if(pd<-50){setFI('d-pen','warn');setFH('d-pen-h',`เกินพอ ${fmt(-pd)} หน่วย`,'fh-warn');}
+  else{setFI('d-pen','good');setFH('d-pen-h','✓ พอดีแล้ว','fh-good');}
+
+  const ms1=`<span class="ms-tag ${s.sb>=sbMin?'ms-pass':'ms-fail'}">${s.sb>=sbMin?'✓':'✗'} ⅓</span>`;
+  const ms2=`<span class="ms-tag ${s.sb>=sbFull?'ms-pass':'ms-fail'}">${s.sb>=sbFull?'✓':'✗'} เต็ม</span>`;
+  document.getElementById('d-sb-note').textContent=`(⅓+1=${fmt(sbMin)} | เต็ม=${fmt(sbFull)})`;
+  if(s.sb<sbMin){setFI('d-sb','bad');setFH('d-sb-h',`${ms1}${ms2} ขาด ${fmt(sbMin-s.sb)} จะข้าม ⅓ (หัก 2× → 0.5×)`);}
+  else if(s.sb<sbFull){setFI('d-sb','good');setFH('d-sb-h',`${ms1}${ms2} ผ่าน ⅓ แล้ว (หัก 0.5×) | ครบโล่อีก ${fmt(sbFull-s.sb)}`);}
+  else{setFI('d-sb','good');setFH('d-sb-h',`${ms1}${ms2} ✓ ทำลายโล่ทั้งก้อน`,'fh-good');}
+
+  const ed=s.ea-eaT;
+  document.getElementById('d-ea-note').textContent=`(พอดี ${eaT===Infinity?'∞':fmt(eaT)})`;
+  if(ed>50){setFI('d-ea','warn');setFH('d-ea-h',`มากเกิน ${fmt(ed)} หน่วย`,'fh-warn');}
+  else if(ed<-50){setFI('d-ea','bad');setFH('d-ea-h',`ยังน้อย ${fmt(-ed)} หน่วย`,'fh-bad');}
+  else{setFI('d-ea','good');setFH('d-ea-h','✓ balance','fh-good');}
+
+  document.getElementById('d-acc-note').textContent=`(cap ${cap===Infinity?'∞':fmt(cap)})`;
+  if(iOver){setFI('d-acc','warn');setFH('d-acc-h',`เกินพอ ${fmt(s.acc-cap)} — ย้ายได้`,'fh-warn');}
+  else if(Math.abs(s.acc-cap)<=10){setFI('d-acc','good');setFH('d-acc-h','✓ พอดีแล้ว','fh-good');}
+  else{setFI('d-acc','bad');setFH('d-acc-h',`ขาด ${fmt(cap-s.acc)} หน่วย`,'fh-bad');}
+
+  if(s.crit<1500){setFI('d-crit','bad');setFH('d-crit-h',`ขาด ${fmt(1500-s.crit)} จาก 1,500`,'fh-bad');}
+  else if(s.crit>2500){setFI('d-crit','warn');setFH('d-crit-h',`คริ ${pct(r.critBase)} − ${pct(r.critReduce)} = ${pct(r.critRate)}`,'fh-warn');}
+  else{setFI('d-crit','good');setFH('d-crit-h',`คริ ${pct(r.critBase)} − ${pct(r.critReduce)} = ${pct(r.critRate)}`,'fh-good');}
+  setFH('d-cdmg-h',`ดาเมจคริ ${(r.cdmgNet*100).toFixed(0)}% (ไม่ถูกลด)`);
+
+  // results
+  // Physical รอด%
+  const physSurv = s.atk>0 ? r.physF/((390+0.317*s.atk)*(1-e.dr/100)) : 0;
+  const dPhysEl = document.getElementById('d-r-phys-pct');
+  const dPhysSub = document.getElementById('d-r-phys-sub');
+  if(dPhysEl){ dPhysEl.textContent=pct(1-r.defP); dPhysEl.style.color=r.defP<0.4?'var(--green)':r.defP<0.6?'var(--orange)':'var(--red)'; }
+  if(dPhysSub) dPhysSub.textContent='เกราะตัด '+pct(r.defP);
+
+  // Element รอด%
+  const dElemEl = document.getElementById('d-r-elem-pct');
+  const dElemSub = document.getElementById('d-r-elem-sub');
+  if(dElemEl){ dElemEl.textContent=pct(1-r.erP); dElemEl.style.color=r.erP<0.4?'var(--green)':r.erP<0.6?'var(--orange)':'var(--red)'; }
+  if(dElemSub) dElemSub.textContent='ต้านธาตุตัด '+pct(r.erP);
+
+  // ทะลุ block
+  const dBlockEl = document.getElementById('d-r-block');
+  const dBlockSub = document.getElementById('d-r-blocksub');
+  if(dBlockEl){
+    if(r.hr>=1){ dBlockEl.textContent='✅ ทะลุได้'; dBlockEl.style.color='var(--green)'; if(dBlockSub) dBlockSub.textContent='บล็อกไม่ได้เลย'; }
+    else{ dBlockEl.textContent=pct(r.hr); dBlockEl.style.color='var(--orange)'; if(dBlockSub) dBlockSub.textContent='บล็อกได้ '+pct(1-r.hr); }
+  }
+
+  // คริสุทธิ
+  const dCritEl = document.getElementById('d-r-critnet');
+  const dCritSub = document.getElementById('d-r-critnet-sub');
+  if(dCritEl){ dCritEl.textContent=pct(r.critRate); dCritEl.style.color='var(--crit)'; }
+  if(dCritSub) dCritSub.textContent='คริฐาน '+pct(r.critBase)+' − ลด '+pct(r.critReduce)+' = '+pct(r.critRate);
+  // DPS balance indicator
+  const dPhysRatio=(r.physF+r.elF)>0?r.physF/(r.physF+r.elF):0.5;
+  const dBCard=document.getElementById('d-r-balance-card');
+  const dBVal=document.getElementById('d-r-balance');
+  const dBSub=document.getElementById('d-r-balance-sub');
+  if(dBCard&&dBVal&&dBSub){
+    if(dPhysRatio>0.60){
+      dBCard.style.cssText+='background:rgba(224,130,58,0.12);border-color:rgba(224,130,58,0.3)';
+      dBVal.style.color='var(--orange)';dBVal.textContent='เน้น Physical';
+      dBSub.textContent='Phys '+fmt(r.physF)+' vs Elem '+fmt(r.elF)+' — ศัตรูเพิ่ม DEF counter ได้';
+    } else if(dPhysRatio<0.40){
+      dBCard.style.cssText+='background:rgba(155,109,214,0.12);border-color:rgba(155,109,214,0.3)';
+      dBVal.style.color='var(--purple)';dBVal.textContent='เน้น Element';
+      dBSub.textContent='Elem '+fmt(r.elF)+' vs Phys '+fmt(r.physF)+' — ศัตรูเพิ่มต้านธาตุ counter ได้';
+    } else {
+      dBCard.style.cssText+='background:rgba(76,175,120,0.08);border-color:rgba(76,175,120,0.25)';
+      dBVal.style.color='var(--green)';dBVal.textContent='Balance';
+      dBSub.textContent='Phys '+fmt(r.physF)+' vs Elem '+fmt(r.elF)+' — ศัตรู counter ยาก';
+    }
+  }
+
+  // checklist
+  const scGap=Math.max(0,e.sd-s.sa);
+  renderChecklist('dps',[
+    {icon:s.atk>=4000?'✓':s.atk>=2500?'!':'✗',cls:s.atk>=4000?'done':s.atk>=2500?'warn':'todo',bc:s.atk>=4000?'cb-done':s.atk>=2500?'cb-warn':'cb-todo',title:'โจมตี (ATK) 4,000+',desc:`ปัจจุบัน ${fmt(s.atk)} · เพิ่มได้เรื่อยๆ ไม่มี cap`,val:s.atk>=4000?`✓ ${fmt(s.atk)}`:s.atk>=2500?fmt(s.atk):`ขาด ${fmt(2500-s.atk)}`,vc:s.atk>=4000?'cv-good':s.atk>=2500?'cv-warn':'cv-bad'},
+    {icon:s.sb>=sbMin?'✓':'✗',cls:s.sb>=sbMin?'done':'todo',bc:s.sb>=sbMin?'cb-done':'cb-todo',title:'ทำลายโล่ — ข้าม ⅓ โล่ศัตรู',desc:`⅓+1=${fmt(sbMin)} | เต็ม=${fmt(sbFull)} | ปัจจุบัน ${fmt(s.sb)}`,val:s.sb>=sbMin?`✓ ${fmt(s.sb)}`:`ขาด ${fmt(sbMin-s.sb)}`,vc:s.sb>=sbMin?'cv-good':'cv-bad'},
+    {icon:s.crit>=1500&&s.crit<=2500?'✓':s.crit<1500?'✗':'!',cls:s.crit>=1500&&s.crit<=2500?'done':s.crit<1500?'todo':'warn',bc:s.crit>=1500&&s.crit<=2500?'cb-done':s.crit<1500?'cb-todo':'cb-warn',title:'คริ 1,500–2,500 + ดาเมจคริสูง',desc:`คริ ${fmt(s.crit)} → ${pct(r.critRate)} (ฐาน ${pct(r.critBase)} − ลด ${pct(r.critReduce)})`,val:s.crit>=1500&&s.crit<=2500?`✓ ${fmt(s.crit)}`:s.crit<1500?`ขาด ${fmt(1500-s.crit)}`:`เกิน +${fmt(s.crit-2500)}`,vc:s.crit>=1500&&s.crit<=2500?'cv-good':s.crit<1500?'cv-bad':'cv-warn'},
+    {icon:r.hr>=1?'✓':iUnder?'✗':'!',cls:r.hr>=1?'done':iUnder?'todo':'warn',bc:r.hr>=1?'cb-done':iUnder?'cb-todo':'cb-warn',title:'แม่นยำ — ตีติด 100%',desc:`cap ${cap===Infinity?'∞':fmt(cap)} | ปัจจุบัน ${fmt(s.acc)}`,val:r.hr>=1?'✓ 100%':iOver?`เกิน +${fmt(s.acc-cap)}`:`พลาด ${((1-r.hr)*100).toFixed(1)}%`,vc:r.hr>=1?'cv-good':iOver?'cv-warn':'cv-bad'},
+    {icon:r.scN>0?'✓':'✗',cls:r.scN>0?'done':'todo',bc:r.scN>0?'cb-done':'cb-todo',title:'ข่มสำนัก > ป้องกันสำนักศัตรู',desc:`ปัจจุบัน ${fmt(s.sa)} | ศัตรูป้องกัน ${fmt(e.sd)} → ${r.scN>0?'+'+fmt(Math.round(r.scN))+' โบนัส':'ไม่เกิดผล (ข่มน้อยกว่า)'}`,val:r.scN>0?'✓ +'+fmt(Math.round(r.scN)):'ไม่ทะลุ',vc:r.scN>0?'cv-good':'cv-bad'},
+  ],'dps');
+
+  // journey
+  const ea2=Math.min(s.acc,cap),b2=computeDPS(s.atk,s.pen,s.sb,s.sa,s.ea,ea2,s.crit,s.cdmg,e).avg;
+  renderJourney('dps',[
+    {name:'เจาะเกราะ',val:s.pen,color:'#c8963c',max:Math.max(penT*2,s.pen*1.5,2000),markers:[{v:Math.round(penT*.55),l:'เริ่มได้'},{v:penT,l:'พอดี'},{v:Math.round(penT*1.7),l:'เกินพอ'}],st:Math.abs(pd)<=50?'good':pd>50?'bad':'warn',stxt:Math.abs(pd)<=50?'พอดี':pd>50?`ขาด ${fmt(pd)}`:`เกิน ${fmt(-pd)}`},
+    {name:'ทำลายโล่',val:s.sb,color:'#4a9edd',max:Math.max(sbFull*1.2,s.sb*1.3,1800),markers:[{v:sbMin,l:'⅓+1'},{v:sbFull,l:'เต็ม'}],st:s.sb>=sbMin?'good':'bad',stxt:s.sb>=sbFull?'ทำลายเต็ม ✓':s.sb>=sbMin?'ผ่าน ⅓ ✓':`ขาด ${fmt(sbMin-s.sb)}`},
+    {name:'โจมตีธาตุ',val:s.ea,color:'#9b6dd6',max:Math.max(eaT===Infinity?s.ea*2:eaT*2,s.ea*1.3,3000),markers:eaT===Infinity?[]:[{v:eaT,l:'พอดี'}],st:Math.abs(ed)<=50?'good':ed>50?'warn':'bad',stxt:Math.abs(ed)<=50?'balance ✓':ed>50?`มาก ${fmt(ed)}`:`น้อย ${fmt(-ed)}`},
+    {name:'แม่นยำ',val:s.acc,color:'#3dd6b5',max:Math.max(cap===Infinity?s.acc*1.5:cap*1.5,1500),markers:cap===Infinity?[]:[{v:cap,l:'cap'}],st:r.hr>=1?'good':iUnder?'bad':'warn',stxt:r.hr>=1?'100% ✓':iOver?`เกิน ${fmt(s.acc-cap)}`:`ขาด ${fmt(cap-s.acc)}`},
+    {name:'คริติคอล',val:s.crit,color:'#f0c040',max:3000,markers:[{v:1500,l:'ขั้นต่ำ'},{v:2000,l:'ดี'},{v:2500,l:'เพดาน'}],st:s.crit>=1500&&s.crit<=2500?'good':s.crit<1500?'bad':'warn',stxt:s.crit>=1500&&s.crit<=2500?'ในช่วงดี ✓':s.crit<1500?`ขาด ${fmt(1500-s.crit)}`:`เกิน ${fmt(s.crit-2500)}`},
+  ]);
+
+  // priority
+  const prios=[
+    {l:'คริติคอล +100',g:Math.round(computeDPS(s.atk,s.pen,s.sb,s.sa,s.ea,ea2,s.crit+100,s.cdmg,e).avg-b2)},
+    {l:'ATK +100',g:Math.round(computeDPS(s.atk+100,s.pen,s.sb,s.sa,s.ea,ea2,s.crit,s.cdmg,e).avg-b2)},
+    {l:'ดาเมจคริ +5%',g:Math.round(computeDPS(s.atk,s.pen,s.sb,s.sa,s.ea,ea2,s.crit,s.cdmg+5,e).avg-b2)},
+    {l:'ทำลายโล่ +100',g:Math.round(computeDPS(s.atk,s.pen,s.sb+100,s.sa,s.ea,ea2,s.crit,s.cdmg,e).avg-b2)},
+    {l:'ข่มสำนัก +100',g:Math.round(computeDPS(s.atk,s.pen,s.sb,s.sa+100,s.ea,ea2,s.crit,s.cdmg,e).avg-b2)},
+    {l:'เจาะเกราะ +100',g:Math.round(computeDPS(s.atk,s.pen+100,s.sb,s.sa,s.ea,ea2,s.crit,s.cdmg,e).avg-b2)},
+    {l:'โจมตีธาตุ +100',g:Math.round(computeDPS(s.atk,s.pen,s.sb,s.sa,s.ea+100,ea2,s.crit,s.cdmg,e).avg-b2)},
+    {l:'แม่นยำ +100'+(s.acc>=cap?' ⚠':''),g:s.acc<cap?Math.round(computeDPS(s.atk,s.pen,s.sb,s.sa,s.ea,s.acc+100,s.crit,s.cdmg,e).avg-b2):0},
+  ].sort((a,b)=>b.g-a.g);
+  renderPriority('dps',prios,'pr-b-dps',b2);
+}
+
+// ── TANK compute ──
+function updTank(){
+  const a={atk:n('te-atk-i'),pen:n('te-pen-i'),sb:n('te-sb-i'),sa:n('te-sa-i'),ea:n('te-ea-i'),acc:n('te-acc-i'),crit:n('te-crit-i'),cdmg:n('te-cdmg-i')||175};
+  const t={hp:n('t-hp'),def:n('t-def'),sh:n('t-sh'),sd:n('t-sd'),er:n('t-er'),bl:n('t-bl'),dr:n('t-dr'),cr:n('t-cr')};
+
+  // คำนวณดาเมจที่ Tank รับ (สลับ role)
+  const e={def:t.def,sh:t.sh,sd:t.sd,er:t.er,bl:t.bl,dr:t.dr,cr:t.cr};
+  const r=computeDPS(a.atk,a.pen,a.sb,a.sa,a.ea,a.acc,a.crit,a.cdmg,e);
+
+  // balance indicator
+  const physR = r.physF;
+  const elemR = r.elF;
+  const totalDmg = physR + elemR;
+  const physRatio = totalDmg > 0 ? physR / totalDmg : 0.5;
+
+  // field hints
+  document.getElementById('t-def-note').textContent=`(ลด ${(r.defP*100).toFixed(1)}%)`;
+  setFI('t-def',r.defP>0.5?'good':r.defP>0.35?'warn':'bad');
+  setFH('t-def-h',`ป้องกัน Physical ได้ ${(r.defP*100).toFixed(1)}%`,r.defP>0.5?'fh-good':r.defP>0.35?'fh-warn':'fh-bad');
+
+  document.getElementById('t-sh-note').textContent=t.sh>0?`(ดูด ${fmt(r.shLoss)} ATK)`:'';
+  setFI('t-sh',r.shLoss>0?'good':'');
+  setFH('t-sh-h',t.sh>0?`โล่ดูด ATK ไป ${fmt(r.shLoss)} (netATK ${fmt(r.netA)})`:'');
+
+  document.getElementById('t-er-note').textContent=`(ลด ${(r.erP*100).toFixed(1)}%)`;
+  setFI('t-er',r.erP>0.5?'good':r.erP>0.35?'warn':'bad');
+  setFH('t-er-h',`ป้องกัน Element ได้ ${(r.erP*100).toFixed(1)}%`,r.erP>0.5?'fh-good':r.erP>0.35?'fh-warn':'fh-bad');
+
+  document.getElementById('t-bl-note').textContent=`(หลบ ${pct(1-r.hr)})`;
+  setFI('t-bl',r.hr<0.7?'good':r.hr<0.9?'warn':'bad');
+  setFH('t-bl-h',`ศัตรู Hit Rate ${pct(r.hr)} — หลบได้ ${pct(1-r.hr)}`,r.hr<0.7?'fh-good':r.hr<0.9?'fh-warn':'fh-bad');
+
+  document.getElementById('t-dr-note').textContent=`(ลดทุกดาเมจ ${t.dr}%)`;
+  setFI('t-dr',t.dr>=25?'good':t.dr>=15?'warn':'bad');
+  setFH('t-dr-h',t.dr>=35?'Tank สุดจัด ✓':t.dr>=25?'ดีมาก':t.dr>=15?'พอใช้':'ควรเพิ่ม',t.dr>=25?'fh-good':t.dr>=15?'fh-warn':'fh-bad');
+
+  const critReduceT=t.cr/(t.cr+a.crit)*0.5;
+  setFH('t-cr-h',`ลดโอกาสโดนคริได้ ${pct(critReduceT)}`,'fh-good');
+
+  // results
+  // ลด Physical
+  const tDefEl=document.getElementById('t-r-defpct');
+  const tDefSub=document.getElementById('t-r-defpct-sub');
+  if(tDefEl){tDefEl.textContent=pct(r.defP);tDefEl.style.color=r.defP>0.5?'var(--green)':r.defP>0.35?'var(--orange)':'var(--red)';}
+  if(tDefSub)tDefSub.textContent='เกราะ '+t.def.toLocaleString('th');
+
+  // ลด Element
+  const tErEl=document.getElementById('t-r-erpct');
+  const tErSub=document.getElementById('t-r-erpct-sub');
+  if(tErEl){tErEl.textContent=pct(r.erP);tErEl.style.color=r.erP>0.5?'var(--green)':r.erP>0.35?'var(--orange)':'var(--red)';}
+  if(tErSub)tErSub.textContent='ต้านธาตุ '+t.er.toLocaleString('th');
+
+  // อัตราบล็อก
+  const tBlEl=document.getElementById('t-r-blockpct');
+  const tBlSub=document.getElementById('t-r-blockpct-sub');
+  const blockRate=1-r.hr;
+  if(tBlEl){tBlEl.textContent=pct(blockRate);tBlEl.style.color=blockRate>0.3?'var(--green)':blockRate>0.1?'var(--orange)':'var(--red)';}
+  if(tBlSub)tBlSub.textContent='ศัตรูตีโดน '+pct(r.hr);
+
+  // รับดาเมจเฉลี่ย
+  setRS('t-r-dmg',fmt(r.avg));
+  document.getElementById('t-r-critsub').textContent='คริ '+fmt(r.totCrit)+' | ศัตรูคริ '+pct(r.critRate);
+  // balance card
+  const bCard=document.getElementById('t-r-balance-card');
+  const bVal=document.getElementById('t-r-balance');
+  const bSub=document.getElementById('t-r-balance-sub');
+  if(bCard&&bVal&&bSub){
+    if(physRatio>0.60){
+      bCard.style.cssText+='background:rgba(217,64,64,0.12);border-color:rgba(217,64,64,0.3)';
+      bVal.style.color='var(--red)';bVal.textContent='อ่อน Physical';
+      bSub.textContent='Phys '+fmt(r.physF)+' vs Elem '+fmt(r.elF)+' — เพิ่ม DEF/โล่';
+    } else if(physRatio<0.40){
+      bCard.style.cssText+='background:rgba(155,109,214,0.12);border-color:rgba(155,109,214,0.3)';
+      bVal.style.color='var(--purple)';bVal.textContent='อ่อน Element';
+      bSub.textContent='Elem '+fmt(r.elF)+' vs Phys '+fmt(r.physF)+' — เพิ่มต้านธาตุ';
+    } else {
+      bCard.style.cssText+='background:rgba(76,175,120,0.08);border-color:rgba(76,175,120,0.25)';
+      bVal.style.color='var(--green)';bVal.textContent='Balance';
+      bSub.textContent='Phys '+fmt(r.physF)+' vs Elem '+fmt(r.elF)+' — ศัตรูไม่ได้เปรียบ';
+    }
+  }
+  // hit rate info รวมใน t-r-blockpct-sub แล้ว
+
+  // checklist
+  renderChecklist('tank',[
+    {icon:t.def>=4000?'✓':t.def>=2500?'!':'✗',cls:t.def>=4000?'done':t.def>=2500?'warn':'todo',bc:t.def>=4000?'cb-done':t.def>=2500?'cb-warn':'cb-todo',title:'ป้องกัน (DEF) 2,500–4,500',desc:`ปัจจุบัน ${fmt(t.def)} | ลด Physical ${(r.defP*100).toFixed(1)}%`,val:t.def>=4000?`✓ ${fmt(t.def)}`:t.def>=2500?fmt(t.def):`ขาด ${fmt(2500-t.def)}`,vc:t.def>=4000?'cv-good':t.def>=2500?'cv-warn':'cv-bad'},
+    {icon:t.sh>=2500?'✓':t.sh>=1500?'!':'✗',cls:t.sh>=2500?'done':t.sh>=1500?'warn':'todo',bc:t.sh>=2500?'cb-done':t.sh>=1500?'cb-warn':'cb-todo',title:'โล่พลังชี 2,500–3,500',desc:`ปัจจุบัน ${fmt(t.sh)} | ดูด ATK ${fmt(r.shLoss)} หน่วย`,val:t.sh>=2500?`✓ ${fmt(t.sh)}`:t.sh>=1500?fmt(t.sh):`ขาด ${fmt(2500-t.sh)}`,vc:t.sh>=2500?'cv-good':t.sh>=1500?'cv-warn':'cv-bad'},
+    {icon:t.er>=600?'✓':t.er>=300?'!':'✗',cls:t.er>=600?'done':t.er>=300?'warn':'todo',bc:t.er>=600?'cb-done':t.er>=300?'cb-warn':'cb-todo',title:'ต้านทานธาตุ 300–600+',desc:`ปัจจุบัน ${fmt(t.er)} | ลด Element ${(r.erP*100).toFixed(1)}%`,val:t.er>=600?`✓ ${fmt(t.er)}`:t.er>=300?fmt(t.er):`ขาด ${fmt(300-t.er)}`,vc:t.er>=600?'cv-good':t.er>=300?'cv-warn':'cv-bad'},
+    {icon:t.dr>=25?'✓':t.dr>=15?'!':'✗',cls:t.dr>=25?'done':t.dr>=15?'warn':'todo',bc:t.dr>=25?'cb-done':t.dr>=15?'cb-warn':'cb-todo',title:'ลดดาเมจ % 15–35%+',desc:`ปัจจุบัน ${t.dr}% | Tank สุดจัด ≥35%`,val:t.dr>=25?`✓ ${t.dr}%`:t.dr>=15?`${t.dr}%`:`ขาด ${fmt(15-t.dr)}%`,vc:t.dr>=25?'cv-good':t.dr>=15?'cv-warn':'cv-bad'},
+    {icon:t.bl>=700?'✓':t.bl>=400?'!':'✗',cls:t.bl>=700?'done':t.bl>=400?'warn':'todo',bc:t.bl>=700?'cb-done':t.bl>=400?'cb-warn':'cb-todo',title:'หลบ (Block) 700–1,000',desc:`ปัจจุบัน ${fmt(t.bl)} | ศัตรู Hit Rate ${pct(r.hr)}`,val:t.bl>=700?`✓ ${fmt(t.bl)}`:t.bl>=400?fmt(t.bl):`ขาด ${fmt(700-t.bl)}`,vc:t.bl>=700?'cv-good':t.bl>=400?'cv-warn':'cv-bad'},
+    {icon:t.cr>=500?'✓':t.cr>=300?'!':'✗',cls:t.cr>=500?'done':t.cr>=300?'warn':'todo',bc:t.cr>=500?'cb-done':t.cr>=300?'cb-warn':'cb-todo',title:'ต้านคริ — ลดโอกาสโดนคริ',desc:`ปัจจุบัน ${fmt(t.cr)} | ลดโอกาสโดนคริ ${pct(critReduceT)}`,val:t.cr>=500?`✓ ${fmt(t.cr)}`:t.cr>=300?fmt(t.cr):`ขาด ${fmt(300-t.cr)}`,vc:t.cr>=500?'cv-good':t.cr>=300?'cv-warn':'cv-bad'},
+  ],'tank');
+
+  // journey
+  const bAvgT=r.avg;
+  renderJourney('tank',[
+    {name:'ป้องกัน (DEF)',val:t.def,color:'#4a9edd',max:5000,markers:[{v:2500,l:'เริ่มดี'},{v:3500,l:'ดีมาก'},{v:4500,l:'Tank'}],st:t.def>=4000?'good':t.def>=2500?'warn':'bad',stxt:t.def>=4000?'ดีมาก ✓':t.def>=2500?'พอใช้':`ขาด ${fmt(2500-t.def)}`},
+    {name:'โล่พลังชี',val:t.sh,color:'#3dd6b5',max:4000,markers:[{v:2500,l:'ดีมาก'},{v:3500,l:'เต็ม'}],st:t.sh>=2500?'good':t.sh>=1500?'warn':'bad',stxt:t.sh>=2500?'ดีมาก ✓':t.sh>=1500?'พอใช้':`ขาด ${fmt(2500-t.sh)}`},
+    {name:'ต้านทานธาตุ',val:t.er,color:'#9b6dd6',max:800,markers:[{v:300,l:'พอไหว'},{v:500,l:'ดีมาก'},{v:650,l:'เริ่มดิ้น'}],st:t.er>=600?'good':t.er>=300?'warn':'bad',stxt:t.er>=600?'ดี ✓':t.er>=300?'พอใช้':`ขาด ${fmt(300-t.er)}`},
+    {name:'ลดดาเมจ %',val:t.dr,color:'#c8963c',max:40,markers:[{v:10,l:'โดดี'},{v:25,l:'โทง'},{v:35,l:'Tank'}],st:t.dr>=25?'good':t.dr>=15?'warn':'bad',stxt:t.dr>=25?'ดีมาก ✓':t.dr>=15?'พอใช้':`ขาด ${fmt(15-t.dr)}%`},
+    {name:'หลบ (Block)',val:t.bl,color:'#4caf78',max:1100,markers:[{v:700,l:'ดีมาก'},{v:865,l:'cap แม่น 1,000'},{v:1000,l:'เต็ม'}],st:t.bl>=700?'good':t.bl>=400?'warn':'bad',stxt:t.bl>=700?'ดีมาก ✓':t.bl>=400?'พอใช้':`ขาด ${fmt(700-t.bl)}`},
+  ]);
+
+  // priority — ลด avg damage ที่รับ
+  const tPrios=[
+    {l:'ป้องกัน +100',g:-Math.round(computeDPS(a.atk,a.pen,a.sb,a.sa,a.ea,a.acc,a.crit,a.cdmg,{...e,def:t.def+100}).avg-bAvgT)},
+    {l:'โล่พลังชี +100',g:-Math.round(computeDPS(a.atk,a.pen,a.sb,a.sa,a.ea,a.acc,a.crit,a.cdmg,{...e,sh:t.sh+100}).avg-bAvgT)},
+    {l:'ต้านทานธาตุ +100',g:-Math.round(computeDPS(a.atk,a.pen,a.sb,a.sa,a.ea,a.acc,a.crit,a.cdmg,{...e,er:t.er+100}).avg-bAvgT)},
+    {l:'ลดดาเมจ +1%',g:-Math.round(computeDPS(a.atk,a.pen,a.sb,a.sa,a.ea,a.acc,a.crit,a.cdmg,{...e,dr:t.dr+1}).avg-bAvgT)},
+    {l:'หลบ +100',g:-Math.round(computeDPS(a.atk,a.pen,a.sb,a.sa,a.ea,a.acc,a.crit,a.cdmg,{...e,bl:t.bl+100}).avg-bAvgT)},
+    {l:'HP +1,000',g:t.hp>0?Math.round(bAvgT*(1000/(t.hp+1000))):0}, // EHP equivalent
+  ].sort((a,b)=>b.g-a.g);
+  // เพิ่ม note สำหรับ priority Tank
+  const tPrioNote='(ลดดาเมจที่รับได้/ตี)';
+  renderPriority('tank',tPrios,'pr-b-tank',bAvgT,tPrioNote);
+}
+
+// ── HEALER compute ──
+function updHeal(){
+  const s={
+    atk:n('h-atk'),bonus:n('h-bonus'),pct:n('h-pct'),crit:n('h-crit'),mult:n('h-mult')||1,
+    // defensive
+    hp:n('h-hp'),def:n('h-def'),sh:n('h-sh'),sd:n('h-sd'),er:n('h-er'),bl:n('h-bl'),dr:n('h-dr'),cr:n('h-cr')
+  };
+  const critRate=s.crit/(s.crit+713); // อัตราคริรักษา
+  const baseHeal=s.mult*(s.atk+s.bonus)*(1+s.pct/100);
+  const critHeal=baseHeal*1.25;
+  const avgHeal=baseHeal*(1-critRate)+critHeal*critRate;
+  const hps=avgHeal/1.5; // GCD 1.5s
+
+  // ── Defensive calculations (same model as Tank, simulated incoming DPS) ──
+  const enemyAtk=4500,enemyCdmg=1.7;
+  const defP=s.def/(s.def+2860);
+  const erP=s.er/(s.er+530);
+  const blockRate=Math.min(1,s.bl/(s.bl+722)*1.44); // block rate
+  const phys=(390+0.317*Math.max(0,enemyAtk-Math.max(0,s.sh-s.sh*0.5)))*(1-defP)*(1-s.dr/100);
+  const incomingDmg=phys; // estimate physical from generic DPS
+  const critReduceT=s.cr/(s.cr+1500)*0.5;
+  const blockedDmg=incomingDmg*0.5; // ถูกบล็อกยังโดน 50%
+  const avgIncoming=incomingDmg*(1-blockRate)+blockedDmg*blockRate;
+
+  // field hints
+  document.getElementById('h-bonus-note').textContent=`(ATK+bonus=${fmt(s.atk+s.bonus)})`;
+  setFI('h-bonus',s.bonus>=500?'good':s.bonus>=200?'warn':'bad');
+  setFH('h-bonus-h',`ฐานรักษา ${fmt(s.atk+s.bonus)}`,s.bonus>=500?'fh-good':s.bonus>=200?'fh-warn':'fh-bad');
+  setFH('h-pct-h',s.pct>0?`โบนัส ×${(1+s.pct/100).toFixed(2)} = ${fmt(baseHeal)}`:'ยังไม่มีโบนัส %',s.pct>=20?'fh-good':s.pct>0?'fh-warn':'');
+  if(s.crit<800){setFI('h-crit','bad');setFH('h-crit-h',`คริรักษา ${pct(critRate)} | ขาด ${fmt(800-s.crit)}`,'fh-bad');}
+  else if(s.crit<=1500){setFI('h-crit','good');setFH('h-crit-h',`คริรักษา ${pct(critRate)} | อยู่ในช่วงดี`,'fh-good');}
+  else{setFI('h-crit','warn');setFH('h-crit-h',`คริรักษา ${pct(critRate)} | เกิน diminishing return`,'fh-warn');}
+
+  // defensive hints
+  setFI('h-def',s.def>=2500?'good':s.def>=1500?'warn':'bad');
+  setFH('h-def-h',`ลด Physical ${(defP*100).toFixed(1)}%`,s.def>=2500?'fh-good':s.def>=1500?'fh-warn':'fh-bad');
+  setFI('h-sh',s.sh>=1500?'good':s.sh>=800?'warn':'bad');
+  setFH('h-sh-h',`ดูด ATK ก่อนเข้าโล่`,s.sh>=1500?'fh-good':s.sh>=800?'fh-warn':'fh-bad');
+  setFI('h-er',s.er>=300?'good':s.er>=150?'warn':'bad');
+  setFH('h-er-h',`ลด Element ${(erP*100).toFixed(1)}%`,s.er>=300?'fh-good':s.er>=150?'fh-warn':'fh-bad');
+  setFI('h-bl',s.bl>=500?'good':s.bl>=250?'warn':'bad');
+  setFH('h-bl-h',`บล็อก ${pct(blockRate)}`,s.bl>=500?'fh-good':s.bl>=250?'fh-warn':'fh-bad');
+  setFI('h-dr',s.dr>=15?'good':s.dr>=5?'warn':'bad');
+  setFH('h-dr-h',`ลดดาเมจรับรวม ${s.dr}%`,s.dr>=15?'fh-good':s.dr>=5?'fh-warn':'fh-bad');
+  setFI('h-cr',s.cr>=400?'good':s.cr>=200?'warn':'bad');
+  setFH('h-cr-h',`ลดโอกาสโดนคริ ${pct(critReduceT)}`,s.cr>=400?'fh-good':s.cr>=200?'fh-warn':'fh-bad');
+
+  // results: healing
+  setRS('h-r-heal',fmt(baseHeal));
+  setRS('h-r-crit',fmt(critHeal));
+  setRS('h-r-avg',fmt(avgHeal));
+  setRS('h-r-cr',pct(critRate));
+  document.getElementById('h-r-crsub').textContent=`คริ ${s.crit.toLocaleString()} หน่วย`;
+
+  // results: defense
+  setRS('h-r-defpct',(defP*100).toFixed(1)+'%');
+  setRS('h-r-erpct',(erP*100).toFixed(1)+'%');
+  setRS('h-r-blockpct',pct(blockRate));
+  setRS('h-r-incdmg',fmt(avgIncoming));
+  document.getElementById('h-r-incdmg-sub').textContent=`สมมติ ATK ${fmt(enemyAtk)} ตี`;
+
+  // Survival: เปรียบเทียบ HPS ตัวเอง กับ damage ที่จะรับ
+  const selfHps=avgHeal; // ฮีลตัวเองครั้ง = avgHeal เต็มๆ
+  const survCard=document.getElementById('h-r-survival-card');
+  const survVal=document.getElementById('h-r-survival');
+  const survSub=document.getElementById('h-r-survival-sub');
+  if(survVal && survSub) {
+    const ratio=avgIncoming>0 ? selfHps/avgIncoming : 999;
+    if(ratio >= 2.0){
+      survVal.textContent='ดี ✓';
+      survVal.style.color='var(--green)';
+      survSub.textContent=`ฮีลตัวเอง ${fmt(selfHps)} >> รับ ${fmt(avgIncoming)} — รอด`;
+      if(survCard) survCard.style.cssText+=';background:rgba(76,175,120,.08);border-color:rgba(76,175,120,.25)';
+    } else if(ratio >= 1.0){
+      survVal.textContent='ก้ำกึ่ง';
+      survVal.style.color='var(--crit)';
+      survSub.textContent=`ฮีล ${fmt(selfHps)} ≈ รับ ${fmt(avgIncoming)} — ระวัง`;
+      if(survCard) survCard.style.cssText+=';background:rgba(240,192,64,.08);border-color:rgba(240,192,64,.25)';
+    } else {
+      survVal.textContent='เสี่ยง ✗';
+      survVal.style.color='var(--red)';
+      survSub.textContent=`ฮีล ${fmt(selfHps)} < รับ ${fmt(avgIncoming)} — ตายได้`;
+      if(survCard) survCard.style.cssText+=';background:rgba(217,64,64,.08);border-color:rgba(217,64,64,.25)';
+    }
+  }
+
+  // Compare with Tank's incoming damage (if Tank tab has data)
+  const tankInput = document.getElementById('t-r-dmg');
+  const tankDmgText = tankInput ? tankInput.textContent.replace(/[^0-9]/g,'') : '';
+  const tankDmg = tankDmgText ? parseFloat(tankDmgText) : 0;
+  const cmpCard = document.getElementById('h-r-cmp-card');
+  const cmpVal  = document.getElementById('h-r-cmp');
+  const cmpSub  = document.getElementById('h-r-cmpsub');
+  if(cmpVal && cmpSub) {
+    if(tankDmg > 0) {
+      const ratio = avgHeal/tankDmg;
+      cmpVal.textContent = ratio.toFixed(2)+'×';
+      if(ratio >= 1.5){
+        cmpVal.style.color='var(--green)';
+        cmpSub.textContent='ฮีล '+fmt(avgHeal)+' vs Tank รับ '+fmt(tankDmg)+'/ตี — เพียงพอ';
+        if(cmpCard) cmpCard.style.cssText+=';background:rgba(76,175,120,.08);border-color:rgba(76,175,120,.25)';
+      } else if(ratio >= 1.0){
+        cmpVal.style.color='var(--crit)';
+        cmpSub.textContent='ฮีล '+fmt(avgHeal)+' vs Tank รับ '+fmt(tankDmg)+'/ตี — ก้ำกึ่ง';
+        if(cmpCard) cmpCard.style.cssText+=';background:rgba(240,192,64,.08);border-color:rgba(240,192,64,.25)';
+      } else {
+        cmpVal.style.color='var(--red)';
+        cmpSub.textContent='ฮีล '+fmt(avgHeal)+' < Tank รับ '+fmt(tankDmg)+' — Tank ตาย';
+        if(cmpCard) cmpCard.style.cssText+=';background:rgba(217,64,64,.08);border-color:rgba(217,64,64,.25)';
+      }
+    } else {
+      cmpVal.textContent = '—';
+      cmpSub.textContent = 'กรอก stat ที่แท็บ Tank ก่อน';
+    }
+  }
+
+  // checklist — รวม healing + defensive (9 ข้อ)
+  renderChecklist('heal',[
+    // Healing
+    {icon:s.atk>=2500?'✓':s.atk>=1500?'!':'✗',cls:s.atk>=2500?'done':s.atk>=1500?'warn':'todo',bc:s.atk>=2500?'cb-done':s.atk>=1500?'cb-warn':'cb-todo',title:'⚕ ATK (ฐานรักษา)',desc:`ปัจจุบัน ${fmt(s.atk)} | เพิ่มได้เรื่อยๆ ไม่มี cap`,val:s.atk>=2500?`✓ ${fmt(s.atk)}`:s.atk>=1500?fmt(s.atk):`ขาด ${fmt(2500-s.atk)}`,vc:s.atk>=2500?'cv-good':s.atk>=1500?'cv-warn':'cv-bad'},
+    {icon:s.bonus>=500?'✓':s.bonus>=200?'!':'✗',cls:s.bonus>=500?'done':s.bonus>=200?'warn':'todo',bc:s.bonus>=500?'cb-done':s.bonus>=200?'cb-warn':'cb-todo',title:'⚕ โบนัสการรักษา 500+',desc:`ปัจจุบัน ${fmt(s.bonus)} | ATK+bonus = ${fmt(s.atk+s.bonus)}`,val:s.bonus>=500?`✓ ${fmt(s.bonus)}`:s.bonus>=200?fmt(s.bonus):`ขาด ${fmt(500-s.bonus)}`,vc:s.bonus>=500?'cv-good':s.bonus>=200?'cv-warn':'cv-bad'},
+    {icon:s.crit>=800&&s.crit<=1500?'✓':s.crit<800?'✗':'!',cls:s.crit>=800&&s.crit<=1500?'done':s.crit<800?'todo':'warn',bc:s.crit>=800&&s.crit<=1500?'cb-done':s.crit<800?'cb-todo':'cb-warn',title:'⚕ คริติคอล 800–1,500',desc:`คริ ${fmt(s.crit)} → โอกาสคริ ${pct(critRate)}`,val:s.crit>=800&&s.crit<=1500?`✓ ${fmt(s.crit)}`:s.crit<800?`ขาด ${fmt(800-s.crit)}`:`เกิน ${fmt(s.crit-1500)}`,vc:s.crit>=800&&s.crit<=1500?'cv-good':s.crit<800?'cv-bad':'cv-warn'},
+    // Defensive
+    {icon:s.hp>=70000?'✓':s.hp>=50000?'!':'✗',cls:s.hp>=70000?'done':s.hp>=50000?'warn':'todo',bc:s.hp>=70000?'cb-done':s.hp>=50000?'cb-warn':'cb-todo',title:'🛡 HP 70,000+',desc:`ปัจจุบัน ${fmt(s.hp)} | Healer ควรอยู่รอด`,val:s.hp>=70000?`✓ ${fmt(s.hp)}`:s.hp>=50000?fmt(s.hp):`ขาด ${fmt(50000-s.hp)}`,vc:s.hp>=70000?'cv-good':s.hp>=50000?'cv-warn':'cv-bad'},
+    {icon:s.def>=2500?'✓':s.def>=1500?'!':'✗',cls:s.def>=2500?'done':s.def>=1500?'warn':'todo',bc:s.def>=2500?'cb-done':s.def>=1500?'cb-warn':'cb-todo',title:'🛡 ป้องกัน (DEF) 2,500+',desc:`ปัจจุบัน ${fmt(s.def)} | ลด Physical ${(defP*100).toFixed(1)}%`,val:s.def>=2500?`✓ ${fmt(s.def)}`:s.def>=1500?fmt(s.def):`ขาด ${fmt(1500-s.def)}`,vc:s.def>=2500?'cv-good':s.def>=1500?'cv-warn':'cv-bad'},
+    {icon:s.sh>=1500?'✓':s.sh>=800?'!':'✗',cls:s.sh>=1500?'done':s.sh>=800?'warn':'todo',bc:s.sh>=1500?'cb-done':s.sh>=800?'cb-warn':'cb-todo',title:'🛡 โล่พลังชี 1,500+',desc:`ปัจจุบัน ${fmt(s.sh)} | ดูด ATK ก่อนเข้าโล่`,val:s.sh>=1500?`✓ ${fmt(s.sh)}`:s.sh>=800?fmt(s.sh):`ขาด ${fmt(800-s.sh)}`,vc:s.sh>=1500?'cv-good':s.sh>=800?'cv-warn':'cv-bad'},
+    {icon:s.er>=300?'✓':s.er>=150?'!':'✗',cls:s.er>=300?'done':s.er>=150?'warn':'todo',bc:s.er>=300?'cb-done':s.er>=150?'cb-warn':'cb-todo',title:'🛡 ต้านทานธาตุ 300+',desc:`ปัจจุบัน ${fmt(s.er)} | ลด Element ${(erP*100).toFixed(1)}%`,val:s.er>=300?`✓ ${fmt(s.er)}`:s.er>=150?fmt(s.er):`ขาด ${fmt(150-s.er)}`,vc:s.er>=300?'cv-good':s.er>=150?'cv-warn':'cv-bad'},
+    {icon:s.bl>=500?'✓':s.bl>=250?'!':'✗',cls:s.bl>=500?'done':s.bl>=250?'warn':'todo',bc:s.bl>=500?'cb-done':s.bl>=250?'cb-warn':'cb-todo',title:'🛡 หลบ (Block) 500+',desc:`ปัจจุบัน ${fmt(s.bl)} | บล็อก ${pct(blockRate)}`,val:s.bl>=500?`✓ ${fmt(s.bl)}`:s.bl>=250?fmt(s.bl):`ขาด ${fmt(250-s.bl)}`,vc:s.bl>=500?'cv-good':s.bl>=250?'cv-warn':'cv-bad'},
+    {icon:s.cr>=400?'✓':s.cr>=200?'!':'✗',cls:s.cr>=400?'done':s.cr>=200?'warn':'todo',bc:s.cr>=400?'cb-done':s.cr>=200?'cb-warn':'cb-todo',title:'🛡 ต้านคริ 400+',desc:`ปัจจุบัน ${fmt(s.cr)} | ลดโอกาสโดนคริ ${pct(critReduceT)}`,val:s.cr>=400?`✓ ${fmt(s.cr)}`:s.cr>=200?fmt(s.cr):`ขาด ${fmt(200-s.cr)}`,vc:s.cr>=400?'cv-good':s.cr>=200?'cv-warn':'cv-bad'},
+  ],'heal');
+
+  // journey — เลือก stat สำคัญ (ทำให้ไม่ยาวเกิน)
+  renderJourney('heal',[
+    {name:'⚕ ATK',val:s.atk,color:'#4caf78',max:5000,markers:[{v:1500,l:'เริ่ม'},{v:2500,l:'ดี'},{v:4000,l:'เยี่ยม'}],st:s.atk>=2500?'good':s.atk>=1500?'warn':'bad',stxt:s.atk>=2500?'ดี ✓':s.atk>=1500?'พอใช้':`ขาด ${fmt(1500-s.atk)}`},
+    {name:'⚕ โบนัสรักษา',val:s.bonus,color:'#3dd6b5',max:2000,markers:[{v:200,l:'พอใช้'},{v:500,l:'ดี'},{v:1000,l:'เยี่ยม'}],st:s.bonus>=500?'good':s.bonus>=200?'warn':'bad',stxt:s.bonus>=500?'ดี ✓':s.bonus>=200?'พอใช้':`ขาด ${fmt(200-s.bonus)}`},
+    {name:'⚕ คริติคอล',val:s.crit,color:'#f0c040',max:2000,markers:[{v:800,l:'ขั้นต่ำ'},{v:1200,l:'ดี'},{v:1500,l:'พอ'}],st:s.crit>=800&&s.crit<=1500?'good':s.crit<800?'bad':'warn',stxt:s.crit>=800&&s.crit<=1500?'ดี ✓':s.crit<800?`ขาด ${fmt(800-s.crit)}`:`เกิน ${fmt(s.crit-1500)}`},
+    {name:'🛡 HP',val:s.hp,color:'#e87070',max:150000,markers:[{v:50000,l:'พอใช้'},{v:70000,l:'ดี'},{v:100000,l:'เยี่ยม'}],st:s.hp>=70000?'good':s.hp>=50000?'warn':'bad',stxt:s.hp>=70000?'ดี ✓':s.hp>=50000?'พอใช้':`ขาด ${fmt(50000-s.hp)}`},
+    {name:'🛡 ป้องกัน',val:s.def,color:'#4a9edd',max:5000,markers:[{v:1500,l:'เริ่ม'},{v:2500,l:'ดี'},{v:4000,l:'เยี่ยม'}],st:s.def>=2500?'good':s.def>=1500?'warn':'bad',stxt:s.def>=2500?'ดี ✓':s.def>=1500?'พอใช้':`ขาด ${fmt(1500-s.def)}`},
+    {name:'🛡 ต้านธาตุ',val:s.er,color:'#9b6dd6',max:800,markers:[{v:150,l:'พอใช้'},{v:300,l:'ดี'},{v:500,l:'เยี่ยม'}],st:s.er>=300?'good':s.er>=150?'warn':'bad',stxt:s.er>=300?'ดี ✓':s.er>=150?'พอใช้':`ขาด ${fmt(150-s.er)}`},
+  ]);
+
+  // priority — +รักษาต่อครั้ง + survival
+  const bHeal=avgHeal;
+  function hg(fn){return Math.round(fn-bHeal);}
+  const hPrios=[
+    {l:'ATK +100',g:hg((s.mult*(s.atk+100+s.bonus)*(1+s.pct/100))*(1-critRate)+(s.mult*(s.atk+100+s.bonus)*(1+s.pct/100)*1.25)*critRate)},
+    {l:'โบนัสรักษา +100',g:hg((s.mult*(s.atk+s.bonus+100)*(1+s.pct/100))*(1-critRate)+(s.mult*(s.atk+s.bonus+100)*(1+s.pct/100)*1.25)*critRate)},
+    {l:'% โบนัส +5%',g:hg((s.mult*(s.atk+s.bonus)*(1+(s.pct+5)/100))*(1-critRate)+(s.mult*(s.atk+s.bonus)*(1+(s.pct+5)/100)*1.25)*critRate)},
+    {l:'คริติคอล +100',g:(()=>{const cr2=(s.crit+100)/(s.crit+100+713);return Math.round(baseHeal*(1-cr2)+critHeal*cr2-bHeal);})()},
+  ].sort((a,b)=>b.g-a.g);
+  renderPriority('heal',hPrios,'pr-b-heal',bHeal,'(รักษาเพิ่ม/ครั้ง)');
+}
+
+// ── Shared renderers ──
+/* ── Build Tier System ──
+   Computes overall tier from checklist items (done/warn/todo) + key results.
+   Mounts a tier card above the result strip.
+*/
+function renderTier(mode, items, opts={}){
+  const mount = document.getElementById(mode+'-tier-mount');
+  if(!mount) return;
+
+  // Score weights
+  const done  = items.filter(c=>c.cls==='done').length;
+  const warn  = items.filter(c=>c.cls==='warn').length;
+  const todo  = items.filter(c=>c.cls==='todo').length;
+  const info  = items.filter(c=>c.cls==='info').length;
+  const total = items.length - info; // exclude info-only rows
+  const rawScore = total>0 ? (done*1.0 + warn*0.5 + todo*0) / total : 0;
+  const scorePct = Math.round(rawScore * 100);
+
+  // Tier mapping
+  let tier, tierName, tierMsg;
+  if(scorePct >= 95)      { tier='S'; tierName='Optimal Build';    tierMsg='ครบทุกอย่าง ระดับยอดเยี่ยม'; }
+  else if(scorePct >= 80) { tier='A'; tierName='Strong Build';     tierMsg='ดีมาก ขาดเล็กน้อย'; }
+  else if(scorePct >= 60) { tier='B'; tierName='Solid Build';      tierMsg='พอใช้ ต้อง improve บางจุด'; }
+  else if(scorePct >= 40) { tier='C'; tierName='Needs Work';       tierMsg='ขาดหลาย stat — ต้องเสริมด่วน'; }
+  else                    { tier='D'; tierName='Off-track';        tierMsg='Build อาจผิดทาง — ปรึกษา leader'; }
+
+  // Top 3 weaknesses + strengths
+  const weaknesses = items.filter(c=>c.cls==='todo').slice(0,3);
+  const strengths  = items.filter(c=>c.cls==='done').slice(0,3);
+
+  // Mode-specific role label
+  const roleLabel = mode==='dps' ? '⚔ DPS Build'
+                  : mode==='tank' ? '🛡 Tank Build'
+                  : '⚕ Healer Build';
+
+  // Build HTML
+  mount.innerHTML = `
+    <div class="tier-card t-${tier}">
+      <div class="tier-badge">${tier}</div>
+      <div class="tier-body">
+        <div class="tier-label">${roleLabel} · ${tierName}</div>
+        <div class="tier-summary">${tierMsg}</div>
+        <div class="tier-progress"><div class="tier-progress-fill" style="width:${scorePct}%"></div></div>
+        <div class="tier-summary" style="margin-top:3px;color:var(--fg3);font-size:10px">
+          ผ่าน <b style="color:var(--green)">${done}</b> · เตือน <b style="color:var(--crit)">${warn}</b> · ขาด <b style="color:var(--red)">${todo}</b> · รวม ${total} ข้อ
+        </div>
+      </div>
+      <div class="tier-score">
+        <div class="tier-score-val">${scorePct}%</div>
+        <div class="tier-score-lbl">Build Score</div>
+      </div>
+    </div>
+    ${(weaknesses.length>0 || strengths.length>0) ? `
+    <div class="tier-insights">
+      ${weaknesses.length>0 ? `
+      <div class="tier-insight weak">
+        <div class="tier-insight-head">⚠ จุดอ่อน · ควรเสริมก่อน</div>
+        <div class="tier-insight-list">
+          ${weaknesses.map(w=>`<div class="tier-insight-item">• <b>${w.title.replace(/^[⚔🛡⚕💥]\s*/,'')}</b> — ${w.val}</div>`).join('')}
+        </div>
+      </div>` : ''}
+      ${strengths.length>0 ? `
+      <div class="tier-insight strong">
+        <div class="tier-insight-head">✓ จุดแข็ง · ทำได้ดี</div>
+        <div class="tier-insight-list">
+          ${strengths.map(s=>`<div class="tier-insight-item">• <b>${s.title.replace(/^[⚔🛡⚕💥]\s*/,'')}</b> — ${s.val}</div>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>` : ''}
+  `;
+}
+
+function renderChecklist(mode,items,_mode){
+  const el=document.getElementById(mode+'-cl-items');
+  if(!el)return;
+  el.innerHTML=items.map(c=>`<div class="cl-item ${c.cls}"><div class="cl-badge ${c.bc}">${c.icon}</div><div class="cl-body"><div class="cl-title">${c.title}</div><div class="cl-desc">${c.desc}</div></div><div class="cl-val ${c.vc}">${c.val}</div></div>`).join('');
+  const done=items.filter(c=>c.cls==='done'||c.cls==='info').length;
+  const todos=items.filter(c=>c.cls==='todo').length;
+  document.getElementById(mode+'-cl-pass').textContent=done;
+  const rem=document.getElementById(mode+'-cl-rem');
+  rem.textContent=todos>0?`เหลืออีก ${todos} ข้อ`:'✅ ครบแล้ว';
+  rem.className=todos>0?'cl-remain':'cl-remain all';
+
+  /* Phase 3: render Build Tier card */
+  renderTier(mode, items);
+}
+
+function renderJourney(mode,items){
+  const el=document.getElementById(mode+'-sj-items');
+  if(!el)return;
+  el.innerHTML=items.map(jd=>{
+    const fp=clamp(jd.val/jd.max*100,0,100);
+    const mks=jd.markers.map(m=>{const mp=clamp(m.v/jd.max*100,0,100);return`<div class="sj-marker" style="left:${mp}%"></div><div class="sj-marker-lbl" style="left:${mp}%"><span style="font-family:var(--mono);font-weight:600;display:block">${fmt(m.v)}</span>${m.l}</div>`;}).join('');
+    const stCls={'good':'ss-good','warn':'ss-warn','bad':'ss-bad'}[jd.st]||'ss-warn';
+    return`<div class="sj-item"><div class="sj-hd"><span class="sj-name">${jd.name}<span class="sj-status ${stCls}">${jd.stxt}</span></span><span class="sj-val" style="color:${jd.color}">${fmt(jd.val)}</span></div><div class="sj-track"><div class="sj-fill" style="width:${fp}%;background:${jd.color}88"></div>${mks}<div class="sj-thumb" style="left:${fp}%;background:${jd.color}"></div></div><div style="height:8px"></div></div>`;
+  }).join('');
+}
+
+function renderPriority(mode,prios,barCls,base,note=''){
+  const el=document.getElementById(mode+'-pr-items');
+  if(!el)return;
+  const maxG=Math.max(1,...prios.filter(p=>p.g>0).map(p=>p.g));
+  const has=prios.filter(p=>p.g>0),no=prios.filter(p=>p.g<=0);
+  let html=note?`<div style="font-size:10px;color:var(--fg3);margin-bottom:8px">${note}</div>`:'';
+  has.forEach((p,i)=>{
+    const w=Math.round(p.g/maxG*100);
+    html+=`<div class="pr-row"><span class="pr-rank${i<3?' top':''}">${i+1}</span><span class="pr-name">${p.l}</span><div class="pr-bw"><div class="pr-b ${barCls}" style="width:${w}%"></div></div><span class="pr-gain pos">+${fmt(p.g)}<span class="pr-pct">${base>0?'+'+((p.g/base)*100).toFixed(2)+'%':''}</span></span></div>`;
+  });
+  if(no.length){html+=`<div class="pr-divider"><span class="pr-div-lbl">ไม่มีผลเพิ่ม</span></div>`;no.forEach((p,i)=>{html+=`<div class="pr-row"><span class="pr-rank">${has.length+i+1}</span><span class="pr-name" style="color:var(--fg3)">${p.l}</span><div class="pr-bw"><div class="pr-b pr-b-zero" style="width:2%"></div></div><span class="pr-gain zero">0<span class="pr-pct">0.00%</span></span></div>`;});}
+  el.innerHTML=html;
+}
+
+// ── Reset ──
+function resetDPS(){const fields=['d-atk','d-pen','d-sb','d-sa','d-ea','d-acc','d-crit'];fields.forEach(id=>{const el=document.getElementById(id);if(el)el.value=0;});const cdmg=document.getElementById('d-cdmg');if(cdmg)cdmg.value=175;saveAll();updDPS();}
+function resetTank(){const fields=['t-hp','t-def','t-sh','t-sd','t-er','t-bl','t-dr','t-cr'];fields.forEach(id=>{const el=document.getElementById(id);if(el)el.value=0;});saveAll();updTank();}
+function resetHeal(){const fields=['h-atk','h-bonus','h-pct','h-crit','h-hp','h-def','h-sh','h-sd','h-er','h-bl','h-dr','h-cr'];fields.forEach(id=>{const el=document.getElementById(id);if(el)el.value=0;});const mult=document.getElementById('h-mult');if(mult)mult.value=1.0;saveAll();updHeal();}
+
+// ── Healer save ──
+function saveHeal() {
+  saveAll();
+  const msg = document.getElementById('heal-save-msg');
+  if (msg) {
+    msg.textContent = '✓ บันทึกแล้ว';
+    msg.style.color = 'var(--green)';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  }
+}
+
+// ── Tank attacker save ──
+function saveTankAttacker() {
+  syncBar('tank');
+  updTank();
+  saveAll();
+  const msg = document.getElementById('tank-save-msg');
+  if (msg) {
+    msg.textContent = '✓ บันทึกแล้ว';
+    msg.style.color = 'var(--green)';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  }
+  // close panel
+  document.getElementById('tank-edit').classList.remove('open');
+}
+
+// ── LocalStorage ──
+const LS_KEY = 'soj_calc_v100';
+
+function saveAll() {
+  const fields = [
+    // DPS self
+    'd-atk','d-pen','d-sb','d-sa','d-ea','d-acc','d-crit','d-cdmg',
+    // DPS enemy
+    'de-def-i','de-sh-i','de-sd-i','de-er-i','de-bl-i','de-dr-i','de-cr-i',
+    // Tank self
+    't-hp','t-def','t-sh','t-sd','t-er','t-bl','t-dr','t-cr',
+    // Tank enemy (attacker)
+    'te-atk-i','te-pen-i','te-sb-i','te-sa-i','te-ea-i','te-acc-i','te-crit-i','te-cdmg-i',
+    // Healer (heal + defense)
+    'h-atk','h-bonus','h-pct','h-crit','h-mult',
+    'h-hp','h-def','h-sh','h-sd','h-er','h-bl','h-dr','h-cr',
+  ];
+  const data = {};
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  data._mode = currentMode;
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadAll() {
+  // handled in DOMContentLoaded
+}
+
+// auto-save on any input change
+document.addEventListener('input', () => saveAll());
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  // load fields first
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      Object.entries(data).forEach(([id, val]) => {
+        if (id === '_mode') return;
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      });
+      syncBar('dps');
+      syncBar('tank');
+      // restore mode
+      const m = data._mode;
+      if (m && ['dps','tank','heal'].includes(m)) {
+        const btn = document.querySelector('.mode-btn.' + m);
+        if (btn) {
+          currentMode = m;
+          document.querySelectorAll('.mode-panel').forEach(el=>el.classList.remove('on'));
+          document.querySelectorAll('.mode-btn').forEach(el=>el.classList.remove('on'));
+          document.getElementById('panel-'+m).classList.add('on');
+          btn.classList.add('on');
+        }
+      }
+    }
+  } catch(e) { console.log('load err',e); }
+  updDPS();updTank();updHeal();
+});
+</script>
+</body>
+</html>
