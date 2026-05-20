@@ -491,7 +491,7 @@ function ListRow({ r, selected, qty, onClick }) {
   );
 }
 
-function Detail({ r, qty, setQty, onSelect }) {
+function Detail({ r, qty, setQty, onSelect, allRecipes: allRecs }) {
   if (!r) return (
     <div className="detail empty-detail">
       <div className="ed-mark"><IconBook /></div>
@@ -504,8 +504,8 @@ function Detail({ r, qty, setQty, onSelect }) {
   const ingTotal = r.ing.reduce((s,[,q]) => s+q, 0);
   const purchased = r.ing.filter(([id]) => INGREDIENTS[id].price > 0);
   const gathered  = r.ing.filter(([id]) => INGREDIENTS[id].price === 0);
-  const related   = RECIPES.filter(x => x.method === r.method && x.id !== r.id && x.lvl === r.lvl).slice(0,5);
-  const shared    = RECIPES.filter(x => x.id !== r.id && x.ing.some(([id]) => r.ing.some(([id2]) => id===id2))).slice(0,6);
+  const related   = (allRecs||RECIPES).filter(x => x.method === r.method && x.id !== r.id && x.lvl === r.lvl).slice(0,5);
+  const shared    = (allRecs||RECIPES).filter(x => x.id !== r.id && x.ing.some(([id]) => r.ing.some(([id2]) => id===id2))).slice(0,6);
 
   return (
     <div className="detail">
@@ -940,7 +940,7 @@ React.useEffect(() => {
 
         <main className="pane">
           <Detail r={currentRecipe} qty={basket[currentRecipe?.id]||0}
-            setQty={setQty} onSelect={setSelected} />
+            setQty={setQty} onSelect={setSelected} allRecipes={allRecipes} />
         </main>
       </div>
 
