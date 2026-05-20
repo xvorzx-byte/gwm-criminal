@@ -3115,9 +3115,9 @@ updateLogoDisplay();
 function openCookingGuide() {
   const modal = document.getElementById("cooking-modal");
   const iframe = document.getElementById("cooking-iframe");
-  if (!iframe.src || iframe.src === window.location.href) {
+  
     iframe.src = "cooking-guide.html";
-  }
+  
   modal.style.display = "flex";
   document.body.style.overflow = "hidden";
   document.querySelectorAll(".gw-nav .nav-btn").forEach(b => b.classList.remove("active"));
