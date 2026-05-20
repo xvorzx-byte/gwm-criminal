@@ -865,6 +865,39 @@ function AdminPanel({ data, onDataChange, onClose }) {
 }
 
 /* ══════════════════════════════════════════════════════════════ */
+/*  ING ICON — รูปวัตถุดิบ (fallback เป็น dot สี)               */
+/* ══════════════════════════════════════════════════════════════ */
+function IngIcon({ id, catClass, catColor }) {
+  const [err, setErr] = useState(false);
+  const src = `/uploads/icons/ing_${id}.png`;
+  if (err) {
+    return (
+      <div className={`ing-dot-fallback ${catClass}`} style={{
+        width: 32, height: 32, borderRadius: 6,
+        background: `${catColor}22`,
+        border: `1px solid ${catColor}55`,
+        display: "grid", placeItems: "center"
+      }}>
+        <div className="ing-dot" style={{width:8,height:8,borderRadius:2,background:catColor}} />
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt=""
+      onError={() => setErr(true)}
+      style={{
+        width: 40, height: 40, objectFit: "contain",
+        borderRadius: 6,
+        background: "oklch(0.20 0.006 250)",
+        border: "1px solid oklch(0.30 0.008 250 / 0.6)"
+      }}
+    />
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════ */
 /*  MAIN APP                                                       */
 /* ══════════════════════════════════════════════════════════════ */
 function App() {
@@ -1254,7 +1287,9 @@ function DetailPane({ recipe: r, ingredients, methods, allRecipes, basket, onAdd
             const totalC = (ing.price ?? 0) * totalQ;
             return (
               <div className={`dt-ing-row cat-${ck}`} key={idx}>
-                <div className="dt-ing-dot"><div className="ing-dot" /></div>
+                <div className="dt-ing-dot">
+                  <IngIcon id={i.id} catClass={`cat-${ck}`} catColor={cc} />
+                </div>
                 <div className="dt-ing-name">
                   <span className="n">{ing.name}</span>
                   <span className="c">{ing.category}</span>
