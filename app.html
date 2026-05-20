@@ -2362,7 +2362,7 @@ input[type="file"] { display: none; }
       <span class="gwos-sep">·</span>
       <span>made with <a href="https://www.anthropic.com/claude" target="_blank" rel="noopener" class="gwos-link">Claude</a></span>
       <span class="gwos-sep">·</span>
-      <span class="gwos-ver">v76</span>
+      <span class="gwos-ver">v1.46</span>
     </footer>
   </div>
 </div>
@@ -3099,7 +3099,7 @@ function updateLogoDisplay(){
   const nm=document.getElementById('guild-name-display'),sb=document.getElementById('guild-sub-display');
   const brandMark=document.querySelector('.brand-mark');
   if(nm)nm.textContent=state.guildName||'GUILD WAR MANAGER';
-  if(sb)sb.textContent=(state.warName||'Season 1')+' · '+(state.warDate||'')+' · v76';
+  if(sb)sb.textContent=(state.warName||'Season 1')+' · '+(state.warDate||'')+' · v1.46';
   if(state.guildLogoData){
     if(img){img.src=state.guildLogoData;img.style.display='block';}
     if(init)init.style.display='none';
