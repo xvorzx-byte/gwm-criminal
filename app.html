@@ -2905,7 +2905,7 @@ function save(immediate=false) {
         fetch('/api/state', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ attend: me.attend || 'ready' }),
+          body: JSON.stringify({ attend: me.attend || 'ready', profile: { name: me.name, cp: me.cp, cls: me.cls, note: me.note } }),
         }).then(()=>{ _syncTimer=null; _syncHash=_stateHash(state); })
           .catch(() => { _syncTimer=null; toast('บันทึกไม่สำเร็จ — ตรวจสอบการเชื่อมต่อ', 'warn'); });
       } else {
