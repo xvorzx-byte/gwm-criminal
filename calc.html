@@ -24,10 +24,11 @@ body{background:var(--bg);color:var(--fg);font-family:var(--thai);min-height:100
 .mode-bar{display:flex;align-items:center;gap:0;background:var(--bg2);border-bottom:1px solid var(--line);padding:0 16px}
 .mode-btn{font-size:13px;font-weight:600;padding:12px 20px;border:none;background:transparent;color:var(--fg3);cursor:pointer;font-family:var(--thai);display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;transition:all .15s}
 .mode-btn:hover{color:var(--fg2)}
-.mode-btn.on{color:var(--fg);border-bottom-color:var(--gold)}
-.mode-btn.on.dps{border-bottom-color:var(--red)}
-.mode-btn.on.tank{border-bottom-color:var(--blue)}
-.mode-btn.on.heal{border-bottom-color:var(--green)}
+.mode-btn.on{color:var(--gold-l);border-bottom-color:var(--gold);background:rgba(200,150,60,0.08)}
+.mode-btn.on.dps{color:var(--gold-l);border-bottom-color:var(--gold)}
+.mode-btn.on.tank{color:var(--gold-l);border-bottom-color:var(--gold)}
+.mode-btn.on.heal{color:var(--gold-l);border-bottom-color:var(--gold)}
+.mode-bar{background:#0f0d0b}
 .mode-panel{display:none}.mode-panel.on{display:block}
 
 /* enemy/attacker bar */
