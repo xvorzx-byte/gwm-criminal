@@ -799,7 +799,7 @@ function AdminModal({ onClose, onSave }) {
               <input type="number" placeholder="ID วัตถุดิบ" value={ing.id} onChange={e=>updateIng(i,'id',e.target.value)}
                 style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'5px 8px',color:'var(--fg-0)',flex:2}} />
               <input type="number" placeholder="จำนวน" value={ing.qty} min={1} onChange={e=>updateIng(i,'qty',e.target.value)}
-                style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'5px 8px',color:'var(--fg-0)',flex:1}} />
+                style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'5px 8px',color:'var(--fg-0)',width:'80px'}} />
             </div>
           ))}
           <button onClick={addIng} style={{background:'none',border:'1px dashed var(--line)',borderRadius:'var(--r)',padding:'5px',color:'var(--fg-3)',cursor:'pointer',fontSize:'12px'}}>
