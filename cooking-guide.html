@@ -491,7 +491,7 @@ function ListRow({ r, selected, qty, onClick }) {
   );
 }
 
-function Detail({ r, qty, setQty, onSelect, allRecipes: allRecs }) {
+function Detail({ r, qty, setQty, onSelect }) {
   if (!r) return (
     <div className="detail empty-detail">
       <div className="ed-mark"><IconBook /></div>
@@ -504,8 +504,8 @@ function Detail({ r, qty, setQty, onSelect, allRecipes: allRecs }) {
   const ingTotal = r.ing.reduce((s,[,q]) => s+q, 0);
   const purchased = r.ing.filter(([id]) => INGREDIENTS[id].price > 0);
   const gathered  = r.ing.filter(([id]) => INGREDIENTS[id].price === 0);
-  const related   = (allRecs||RECIPES).filter(x => x.method === r.method && x.id !== r.id && x.lvl === r.lvl).slice(0,5);
-  const shared    = (allRecs||RECIPES).filter(x => x.id !== r.id && x.ing.some(([id]) => r.ing.some(([id2]) => id===id2))).slice(0,6);
+  const related   = RECIPES.filter(x => x.method === r.method && x.id !== r.id && x.lvl === r.lvl).slice(0,5);
+  const shared    = RECIPES.filter(x => x.id !== r.id && x.ing.some(([id]) => r.ing.some(([id2]) => id===id2))).slice(0,6);
 
   return (
     <div className="detail">
@@ -743,115 +743,19 @@ function BasketBar({ basket, setBasket, onSelect }) {
   );
 }
 
-function AdminModal({ onClose, onSave }) {
-  const [name, setName] = React.useState('');
-  const [lvl, setLvl] = React.useState(1);
-  const [method, setMethod] = React.useState('ผัด');
-  const [batch, setBatch] = React.useState(1);
-  const [ings, setIngs] = React.useState([{id:'', qty:1}]);
-
-  const addIng = () => setIngs(p => [...p, {id:'', qty:1}]);
-  const updateIng = (i, k, v) => setIngs(p => p.map((x,j) => j===i ? {...x,[k]:v} : x));
-
-  const handleSave = () => {
-    if (!name.trim()) return alert('กรุณาใส่ชื่อเมนู');
-    const validIngs = ings.filter(x => x.id && x.qty > 0);
-    if (!validIngs.length) return alert('กรุณาใส่วัตถุดิบอย่างน้อย 1 รายการ');
-    onSave({
-      id: Date.now(),
-      name: name.trim(),
-      lvl: +lvl,
-      method,
-      ing: validIngs.map(x => [+x.id, +x.qty]),
-      batch: +batch
-    });
-  };
-
-  return (
-    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{background:'var(--bg-1)',border:'1px solid var(--line)',borderRadius:'var(--r-lg)',padding:'24px',width:'420px',display:'flex',flexDirection:'column',gap:'14px'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <b style={{fontSize:'14px'}}>+ เพิ่มเมนูใหม่</b>
-          <button onClick={onClose} style={{background:'none',border:'none',color:'var(--fg-2)',fontSize:'18px',cursor:'pointer'}}>×</button>
-        </div>
-        <input placeholder="ชื่อเมนู" value={name} onChange={e=>setName(e.target.value)}
-          style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'7px 10px',color:'var(--fg-0)',width:'100%'}} />
-        <div style={{display:'flex',gap:'8px'}}>
-          <select value={lvl} onChange={e=>setLvl(e.target.value)}
-            style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'6px 8px',color:'var(--fg-0)',flex:1}}>
-            <option value={1}>Lv.1</option>
-            <option value={6}>Lv.6</option>
-            <option value={11}>Lv.11</option>
-          </select>
-          <select value={method} onChange={e=>setMethod(e.target.value)}
-            style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'6px 8px',color:'var(--fg-0)',flex:1}}>
-            {['ผัด','ตากลม','แช่แข็ง','นึ่ง','การทอด','การอบ'].map(m=>(
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-          <input type="number" placeholder="batch" value={batch} min={1} onChange={e=>setBatch(e.target.value)}
-            style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'6px 8px',color:'var(--fg-0)',width:'70px'}} />
-        </div>
-        <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-          <span style={{fontSize:'11px',color:'var(--fg-3)'}}>วัตถุดิบ (ID, จำนวน)</span>
-          {ings.map((ing,i) => (
-            <div key={i} style={{display:'flex',gap:'6px',width:'100%'}}>
-              <select value={ing.id} onChange={e=>updateIng(i,'id',e.target.value)}
-                style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'5px 8px',color:'var(--fg-0)',flex:2}}>
-                <option value="">-- เลือกวัตถุดิบ --</option>
-                {Object.values(INGREDIENTS).map(ing => (
-                  <option key={ing.id} value={ing.id}>{ing.name}</option>
-                ))}
-              </select>
-              <input type="number" placeholder="จำนวน" value={ing.qty} min={1} onChange={e=>updateIng(i,'qty',e.target.value)}
-                style={{background:'var(--bg-0)',border:'1px solid var(--line)',borderRadius:'var(--r)',padding:'5px 8px',color:'var(--fg-0)',width:'80px'}} />
-            </div>
-          ))}
-          <button onClick={addIng} style={{background:'none',border:'1px dashed var(--line)',borderRadius:'var(--r)',padding:'5px',color:'var(--fg-3)',cursor:'pointer',fontSize:'12px'}}>
-            + เพิ่มวัตถุดิบ
-          </button>
-        </div>
-        <button onClick={handleSave}
-          style={{background:'var(--accent-soft)',border:'1px solid var(--accent-line)',borderRadius:'var(--r)',padding:'8px',color:'var(--accent)',fontWeight:600,cursor:'pointer'}}>
-          บันทึกเมนู
-        </button>
-      </div>
-    </div>
-  );
-}
 function App() {
   const [query,    setQuery]    = useState("");
   const [lvl,      setLvl]      = useState("all");
   const [method,   setMethod]   = useState(new Set());
   const [selected, setSelected] = useState(RECIPES[0].id);
   const [basket,   setBasket]   = useState({});
-  const [session,     setSession]    = useState(null);
-const [customRecs,  setCustomRecs] = useState([]);
-const [allRecipes,  setAllRecipes] = useState(RECIPES);
-const [adminOpen,   setAdminOpen]  = useState(false);
-
-React.useEffect(() => {
-  fetch('/api/state')
-    .then(r => r.json())
-    .then(d => { if (d.session) setSession(d.session); })
-    .catch(() => {});
-  fetch('/api/cooking')
-    .then(r => r.json())
-    .then(d => {
-      if (d.recipes?.length) {
-        setCustomRecs(d.recipes);
-        setAllRecipes([...RECIPES, ...d.recipes]);
-      }
-    })
-    .catch(() => {});
-}, []);
 
   const toggle = (val) => setMethod(prev => {
     const n = new Set(prev); if(n.has(val)) n.delete(val); else n.add(val); return n;
   });
 
   const filtered = useMemo(() => {
-    let list = allRecipes.slice();
+    let list = RECIPES.slice();
     if(lvl !== "all") list = list.filter(r => r.lvl === +lvl);
     if(method.size)   list = list.filter(r => method.has(r.method));
     if(query.trim()) {
@@ -874,21 +778,15 @@ React.useEffect(() => {
     const n={...prev}; if(q<=0) delete n[id]; else n[id]=Math.min(999,q); return n;
   });
 
-  const currentRecipe = allRecipes.find(r => r.id === selected);
+  const currentRecipe = RECIPES.find(r => r.id === selected);
 
   return (
     <div className="app-v2">
       <header className="head">
         <div className="h-title">
           <h1><IconBook />สูตรอาหารและการปรุง</h1>
-          <span className="sub">cooking · {allRecipes.length} recipes · {Object.keys(INGREDIENTS).length} ingredients</span>
+          <span className="sub">cooking · {RECIPES.length} recipes · {Object.keys(INGREDIENTS).length} ingredients</span>
         </div>
-
-{(session?.role === 'admin' || session?.role === 'sub_admin') && (
-      <button style={{padding:'5px 12px',background:'var(--accent-soft)',border:'1px solid var(--accent-line)',borderRadius:'var(--r)',color:'var(--accent)',fontSize:'12px',cursor:'pointer'}} onClick={()=>setAdminOpen(true)}>
-        + เพิ่มเมนู
-      </button>
-    )}
       </header>
 
       <div className="layout">
@@ -940,27 +838,11 @@ React.useEffect(() => {
 
         <main className="pane">
           <Detail r={currentRecipe} qty={basket[currentRecipe?.id]||0}
-            setQty={setQty} onSelect={setSelected} allRecipes={allRecipes} />
+            setQty={setQty} onSelect={setSelected} />
         </main>
       </div>
 
       <BasketBar basket={basket} setBasket={setBasket} onSelect={setSelected} />
-      {adminOpen && (session?.role === 'admin' || session?.role === 'sub_admin') && (
-        <AdminModal
-          onClose={() => setAdminOpen(false)}
-          onSave={async (newRecipe) => {
-            const next = [...customRecs, newRecipe];
-            await fetch('/api/cooking', {
-              method: 'POST',
-              headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({ recipes: next, ingredients: {} })
-            });
-            setCustomRecs(next);
-            setAllRecipes([...RECIPES, ...next]);
-            setAdminOpen(false);
-          }}
-        />
-      )}
     </div>
   );
 }
