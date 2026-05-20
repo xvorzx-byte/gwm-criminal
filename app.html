@@ -3118,6 +3118,8 @@ function openCookingGuide() {
   if (!iframe.src || iframe.src === window.location.href) {
     iframe.src = "cooking-guide.html";
   }
+  iframe.style.opacity = "0";
+  iframe.onload = () => { iframe.style.opacity = "1"; iframe.style.transition = "opacity 0.3s"; };
   modal.style.display = "flex";
   document.body.style.overflow = "hidden";
   document.querySelectorAll(".gw-nav .nav-btn").forEach(b => b.classList.remove("active"));
