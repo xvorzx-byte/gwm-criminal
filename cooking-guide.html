@@ -395,7 +395,7 @@ button, select { cursor: pointer; }
 .form-select:focus { border-color: var(--accent-line); }
 
 /* Ingredient rows in recipe form */
-.ing-form-list { display: flex; flex-direction: column; gap: 6px; }
+.ing-form-list { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
 .ing-form-row {
   display: grid; grid-template-columns: 1fr 80px auto;
   gap: 6px; align-items: center;
@@ -536,6 +536,7 @@ function RecipeModal({ initial, ingredients, methods, onSave, onClose }) {
   );
 
   const addIng  = () => setIngs(p => [...p, { id: allIds[0], qty: 1 }]);
+  const PlusSmall = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{width:11,height:11}}><path d="M12 5v14M5 12h14"/></svg>;
   const rmIng   = i => setIngs(p => p.filter((_,j) => j !== i));
   const setId   = (i,v)=> setIngs(p => p.map((x,j) => j===i ? {...x, id: Number(v)} : x));
   const setQty  = (i,v)=> setIngs(p => p.map((x,j) => j===i ? {...x, qty: Math.max(1, Number(v)||1)} : x));
@@ -589,7 +590,7 @@ function RecipeModal({ initial, ingredients, methods, onSave, onClose }) {
                   <button className="ing-rm-btn" onClick={()=>rmIng(i)} disabled={ings.length<=1}>{Ic.trash}</button>
                 </div>
               ))}
-              <button className="add-ing-btn" onClick={addIng}>{Ic.plus} เพิ่มวัตถุดิบ</button>
+              <button className="add-ing-btn" onClick={addIng}>{PlusSmall} เพิ่มวัตถุดิบ</button>
             </div>
           </div>
         </div>
