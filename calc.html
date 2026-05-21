@@ -399,6 +399,10 @@ body{background:var(--bg);color:var(--fg);font-family:var(--thai);min-height:100
       <div class="ef"><label>หลบ</label><input id="de-bl-i" type="number" value="773" oninput="syncBar('dps');updDPS()"></div>
       <div class="ef"><label>ลดดาเมจ %</label><input id="de-dr-i" type="number" value="2" oninput="syncBar('dps');updDPS()"></div>
       <div class="ef"><label>ต้านคริ</label><input id="de-cr-i" type="number" value="894" oninput="syncBar('dps');updDPS()"></div>
+</div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+      <button class="btn-sm" style="background:rgba(76,175,120,.2);border-color:rgba(76,175,120,.4);color:var(--green);padding:6px 16px;font-size:12px" onclick="saveDpsEnemy()">✓ บันทึกค่าศัตรู</button>
+      <span style="font-size:10px;color:var(--fg3)" id="dps-save-msg"></span>
     </div>
   </div>
   <div class="main">
@@ -1200,6 +1204,20 @@ function saveTankAttacker() {
   }
   // close panel
   document.getElementById('tank-edit').classList.remove('open');
+}
+
+// ── DPS enemy save ──
+function saveDpsEnemy() {
+  syncBar('dps');
+  updDPS();
+  saveAll();
+  const msg = document.getElementById('dps-save-msg');
+  if (msg) {
+    msg.textContent = '✓ บันทึกแล้ว';
+    msg.style.color = 'var(--green)';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  }
+  document.getElementById('dps-edit').classList.remove('open');
 }
 
 // ── LocalStorage ──
