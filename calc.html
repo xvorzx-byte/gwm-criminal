@@ -652,9 +652,10 @@ function computeDPS(atk,pen,sb,sa,ea,acc,crit,cdmg,e){
 
   // Crit Rate: ต้านคริศัตรู ลด crit chance ของเรา (per image 4 formula)
   // ลดคริ% = ต้านคริ / (ต้านคริ + คริ) × 50%
-  const critBase   = crit/(crit+940);          // base crit rate from our stat
-  const critReduce = crit>0 ? e.cr/(e.cr+crit)*0.5 : 0;  // % reduce of CRIT CHANCE
-  const critRate   = Math.max(0, critBase - critReduce); // net crit rate
+  const critNet    = Math.max(0, crit - e.cr);
+  const critRate   = Math.min(1, (115*critNet + 90) / (critNet + 940));
+  const critBase   = critRate;
+  const critReduce = 0;
 
   const cdmgNet=(cdmg/100);                    // crit damage multiplier (no reduction)
   const totCrit=tot*cdmgNet;
@@ -912,7 +913,7 @@ function updHeal(){
     // defensive
     hp:n('h-hp'),def:n('h-def'),sh:n('h-sh'),sd:n('h-sd'),er:n('h-er'),bl:n('h-bl'),dr:n('h-dr'),cr:n('h-cr')
   };
-  const critRate=s.crit/(s.crit+940); // อัตราคริรักษา
+  const critRate=Math.min(1,(115*s.crit+90)/(s.crit+940)); // อัตราคริรักษา
   const baseHeal=s.mult*(s.atk+s.bonus)*(1+s.pct/100);
   const critHeal=baseHeal*1.25;
   const avgHeal=baseHeal*(1-critRate)+critHeal*critRate;
@@ -1053,7 +1054,7 @@ function updHeal(){
     {l:'ATK +100',g:hg((s.mult*(s.atk+100+s.bonus)*(1+s.pct/100))*(1-critRate)+(s.mult*(s.atk+100+s.bonus)*(1+s.pct/100)*1.25)*critRate)},
     {l:'โบนัสรักษา +100',g:hg((s.mult*(s.atk+s.bonus+100)*(1+s.pct/100))*(1-critRate)+(s.mult*(s.atk+s.bonus+100)*(1+s.pct/100)*1.25)*critRate)},
     {l:'% โบนัส +5%',g:hg((s.mult*(s.atk+s.bonus)*(1+(s.pct+5)/100))*(1-critRate)+(s.mult*(s.atk+s.bonus)*(1+(s.pct+5)/100)*1.25)*critRate)},
-    {l:'คริติคอล +100',g:(()=>{const cr2=(s.crit+100)/(s.crit+100+713);return Math.round(baseHeal*(1-cr2)+critHeal*cr2-bHeal);})()},
+    {l:'คริติคอล +100',g:(()=>{const cr2=Math.min(1,(115*(s.crit+100)+90)/((s.crit+100)+940));return Math.round(baseHeal*(1-cr2)+critHeal*cr2-bHeal);})()},
   ].sort((a,b)=>b.g-a.g);
   renderPriority('heal',hPrios,'pr-b-heal',bHeal,'(รักษาเพิ่ม/ครั้ง)');
 }
