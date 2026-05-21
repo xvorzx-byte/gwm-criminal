@@ -5440,8 +5440,8 @@ function saveM(id){
     const prevCls=m.cls;
     const prevCp=m.cp;
     /* Sub-Admin: keep original misses/leaves (read-only enforced server-side too) */
-    const finalMisses=isSuperAdmin()?misses:(m.misses||0);
-    const finalLeaves=isSuperAdmin()?leaves:(m.leaves||0);
+    const finalMisses=isAdmin()?misses:(m.misses||0);
+    const finalLeaves=isAdmin()?leaves:(m.leaves||0);
     m.name=name;m.cls=cls;m.cp=cp;m.attend=attend;m.misses=finalMisses;m.leaves=finalLeaves;m.note=note;m.error=false;
     const currentZid=getMZ(id);
 
