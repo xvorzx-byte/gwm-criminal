@@ -5316,8 +5316,16 @@ function editMemberStatus(id){
   }
   _eid=id;
   const currentAttend = m.attend || 'ready';
-  showModal(`<div class="modal">
-    <h3>อัปเดตสถานะ: ${m.name}</h3>
+showModal(`<div class="modal">
+    <h3>แก้ไขข้อมูล: ${m.name}</h3>
+    <div class="fg">
+      <label>ชื่อในเกม <span style="color:var(--err)">*</span></label>
+      <input id="ms-name" value="${m.name}" placeholder="ชื่อในเกม" style="font-size:13px"/>
+    </div>
+    <div class="fg">
+      <label>CP <span style="font-size:10px;color:var(--fg-3);font-family:var(--mono)">combat power</span></label>
+      <input id="ms-cp" type="number" min="0" value="${m.cp||0}" style="font-size:13px"/>
+    </div>
     <div style="font-size:11px;color:var(--gt);margin-bottom:12px;line-height:1.7;background:rgba(0,0,0,.25);padding:10px 12px;border-radius:6px;border:1px solid var(--gbr)">
       💡 <span style="color:var(--gt)">หากไม่สามารถมาวอร์ได้ → เลือก <b style="color:#ce93d8">"ลา"</b></span><br>
       ⚠ <span style="color:#fb8c00">"ขาด" จะถูกบันทึกโดย Admin หากไม่มาและไม่แจ้ง</span>
@@ -5346,21 +5354,27 @@ function editMemberStatus(id){
       <button class="btn cyan" id="status-save">บันทึก ✓</button>
     </div>
   </div>`);
-  
+
   document.getElementById('status-cancel').onclick = () => {
     closeModal();
     toast('ยกเลิก', 'cancel');
   };
-  
+
   document.getElementById('status-save').onclick = () => {
     const selected = document.querySelector('input[name="status"]:checked');
+    const newName = document.getElementById('ms-name').value.trim();
+    const newCp = parseInt(document.getElementById('ms-cp').value) || 0;
+    if (!newName) { toast('กรุณาใส่ชื่อ', 'warn'); return; }
     if (selected) {
+      const oldName = m.name;
+      m.name = newName;
+      m.cp = newCp;
       m.attend = selected.value;
       save();
       render();
       closeModal();
       const statusLabel = {ready:'พร้อมเล่น', leave:'ลา'};
-      toast(`อัปเดตสถานะเป็น "${statusLabel[selected.value]}" แล้ว`, 'ok');
+      toast(`บันทึก${oldName!==newName?' '+oldName+' → '+newName:''}สำเร็จ`, 'ok');
     }
   };
 }
