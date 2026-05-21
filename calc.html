@@ -652,7 +652,7 @@ function computeDPS(atk,pen,sb,sa,ea,acc,crit,cdmg,e){
 
   // Crit Rate: ต้านคริศัตรู ลด crit chance ของเรา (per image 4 formula)
   // ลดคริ% = ต้านคริ / (ต้านคริ + คริ) × 50%
-  const critBase   = crit/(crit+713);          // base crit rate from our stat
+  const critBase   = crit/(crit+940);          // base crit rate from our stat
   const critReduce = crit>0 ? e.cr/(e.cr+crit)*0.5 : 0;  // % reduce of CRIT CHANCE
   const critRate   = Math.max(0, critBase - critReduce); // net crit rate
 
@@ -912,7 +912,7 @@ function updHeal(){
     // defensive
     hp:n('h-hp'),def:n('h-def'),sh:n('h-sh'),sd:n('h-sd'),er:n('h-er'),bl:n('h-bl'),dr:n('h-dr'),cr:n('h-cr')
   };
-  const critRate=s.crit/(s.crit+713); // อัตราคริรักษา
+  const critRate=s.crit/(s.crit+940); // อัตราคริรักษา
   const baseHeal=s.mult*(s.atk+s.bonus)*(1+s.pct/100);
   const critHeal=baseHeal*1.25;
   const avgHeal=baseHeal*(1-critRate)+critHeal*critRate;
