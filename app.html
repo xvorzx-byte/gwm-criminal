@@ -1437,6 +1437,43 @@ input[type="file"] { display: none; }
   .gw-header {
     flex-wrap: wrap;
     padding: 6px 10px;
+    gap: 4px;
+  }
+  .brand {
+    order: 1;
+    flex: 1;
+    min-width: 0;
+  }
+  .brand-title h1 {
+    font-size: 13px;
+  }
+  .brand-title .meta {
+    display: none;
+  }
+  .nav-right {
+    order: 2;
+    flex-shrink: 0;
+  }
+  .gw-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-shrink: 0;
+  }
+  .gw-nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .reserve-grid { grid-template-columns: repeat(2, 1fr); }
+} {
+  .gw-header {
+    flex-wrap: wrap;
+    padding: 6px 10px;
     gap: 6px;
   }
   .gw-nav {
