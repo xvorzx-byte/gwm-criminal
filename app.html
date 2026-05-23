@@ -2178,7 +2178,11 @@ input[type="file"] { display: none; }
 .wb-col-btn.active,.wb-col-btn:hover{border-color:#fff;transform:scale(1.15)}
 
 .reserve-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px}
-@media(max-width:640px){.reserve-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
+  .reserve-grid{grid-template-columns:repeat(2,1fr)}
+  .reserve-row{grid-template-columns:14px 6px 1fr auto;gap:4px;padding:7px 8px}
+  .rquick{display:none}
+}
 .fl{font-size:11px;font-weight:500;color:var(--gt2);margin-bottom:3px;display:block;letter-spacing:.3px}
 .fh{font-size:10px;color:var(--gt3);margin-top:2px;line-height:1.4}
 .modal input,.modal select{width:100%;padding:8px 11px;border-radius:8px;border:1px solid var(--gbr);background:#0f1923;color:var(--gt);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
