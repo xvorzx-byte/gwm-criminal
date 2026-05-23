@@ -845,6 +845,14 @@ html, body {
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
 }
+@media(max-width:640px){
+  .reserve-head {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .reserve-search-wrap { grid-column: 1 / -1; }
+  .reserve-actions { grid-column: 1 / -1; flex-wrap: wrap; }
+}
 .reserve-title {
   display: flex;
   align-items: center;
