@@ -1473,10 +1473,15 @@ input[type="file"] { display: none; }
   }
   .gw-nav::-webkit-scrollbar { display: none; }
   .nav-btn {
-    padding: 5px 10px;
-    font-size: 11px;
+    padding: 5px 8px;
+    font-size: 0;
     white-space: nowrap;
     flex-shrink: 0;
+  }
+  .nav-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    opacity: 1 !important;
   }
   .reserve-grid { grid-template-columns: repeat(2, 1fr); }
   .stat-bar {
