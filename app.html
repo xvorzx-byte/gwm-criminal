@@ -2177,22 +2177,8 @@ input[type="file"] { display: none; }
 }
 .wb-col-btn.active,.wb-col-btn:hover{border-color:#fff;transform:scale(1.15)}
 
-.reserve-section{background:var(--gcard);border:1px solid var(--gbr);border-radius:10px;overflow:hidden}
-.reserve-hdr{padding:8px 12px;background:linear-gradient(90deg,var(--gp) 0%,rgba(0,0,0,.45) 45%,rgba(0,0,0,.7) 100%),var(--gp);color:#fff;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--gbr)}
 .reserve-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px}
-.hdr-btn{font-size:10px;padding:4px 10px;border-radius:6px;border:1px solid;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .15s}
-.hdr-btn-n{color:#90a4ae;border-color:#37474f;background:rgba(255,255,255,.04)}
-.hdr-btn-n:hover{background:rgba(0,212,255,.1);color:var(--gaccent);border-color:var(--gaccent)}
-.hdr-btn-cap{color:#90caf9;border-color:#1565c0;background:rgba(21,101,192,.2)}
-.hdr-btn-cap:hover{background:rgba(21,101,192,.4)}
-.hdr-btn-d{color:#ff8a80;border-color:#b71c1c;background:rgba(183,28,28,.2)}
-.hdr-btn-d:hover{background:rgba(183,28,28,.5);color:#ffcdd2}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
-.modal{background:#1a2332;border-radius:14px;border:1px solid var(--gbr);padding:20px;width:360px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-.modal.wide{width:520px}
-.modal.xl{width:700px}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--gt);padding-bottom:10px;border-bottom:1px solid var(--gbr);letter-spacing:1px}
-.fg{margin-bottom:10px}
+@media(max-width:640px){.reserve-grid{grid-template-columns:repeat(2,1fr)}}
 .fl{font-size:11px;font-weight:500;color:var(--gt2);margin-bottom:3px;display:block;letter-spacing:.3px}
 .fh{font-size:10px;color:var(--gt3);margin-top:2px;line-height:1.4}
 .modal input,.modal select{width:100%;padding:8px 11px;border-radius:8px;border:1px solid var(--gbr);background:#0f1923;color:var(--gt);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
