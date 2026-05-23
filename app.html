@@ -6269,43 +6269,152 @@ function openHelp(){
 
     <!-- TAB: Calculator -->
     <div id="help-calc" style="display:none">
-      <div class="help-tip">💡 Damage Calculator สำหรับคำนวณ damage และ build อุปกรณ์</div>
+      <div class="help-tip">💡 SOJ Calculator — เครื่องมือคำนวณและประเมิน build อุปกรณ์อย่างละเอียด รองรับ 3 โหมด: DPS, Tank, Healer</div>
 
       <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body">
-        <div class="help-step-title">เปิด Calculator</div>
+        <div class="help-step-title">เปิด Calculator และเลือกโหมด</div>
         <div class="help-step-desc">
-          กดปุ่ม <b>🧮 Calculator</b> ใน Nav Bar ด้านบน<br>
-          จะเปิดหน้า Calculator ใน Tab ใหม่
-        </div>
-      </div></div>
-
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body">
-        <div class="help-step-title">ใส่ค่าสถานะตัวละคร</div>
-        <div class="help-step-desc">
-          กรอกค่าจากหน้า Status ในเกม:<br>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
-            <div style="padding:6px 10px;background:var(--bg-2);border-radius:6px;font-size:11px;text-align:center">ATK / DEF</div>
-            <div style="padding:6px 10px;background:var(--bg-2);border-radius:6px;font-size:11px;text-align:center">Crit Rate / Crit DMG</div>
-            <div style="padding:6px 10px;background:var(--bg-2);border-radius:6px;font-size:11px;text-align:center">HP / Penetration</div>
-            <div style="padding:6px 10px;background:var(--bg-2);border-radius:6px;font-size:11px;text-align:center">DMG Bonus / Reduction</div>
+          กดปุ่ม <b>🧮 Calculator</b> ใน Nav Bar → เปิดใน Tab ใหม่<br><br>
+          ด้านบนสุดเลือกโหมดได้ 3 แบบ:<br>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px">
+            <div style="padding:6px 10px;background:rgba(217,64,64,.1);border:1px solid rgba(217,64,64,.3);border-radius:6px;font-size:11px;text-align:center"><b style="color:#d94040">DPS</b><br><span style="color:var(--fg-3)">เน้นออก damage</span></div>
+            <div style="padding:6px 10px;background:rgba(74,158,221,.1);border:1px solid rgba(74,158,221,.3);border-radius:6px;font-size:11px;text-align:center"><b style="color:#4a9edd">Tank</b><br><span style="color:var(--fg-3)">เน้นรับ damage</span></div>
+            <div style="padding:6px 10px;background:rgba(76,175,120,.1);border:1px solid rgba(76,175,120,.3);border-radius:6px;font-size:11px;text-align:center"><b style="color:#4caf78">Healer</b><br><span style="color:var(--fg-3)">เน้นรักษา</span></div>
           </div>
         </div>
       </div></div>
 
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body">
-        <div class="help-step-title">เปรียบเทียบ Build</div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body">
+        <div class="help-step-title">โหมด DPS — ใส่ค่าตัวเอง</div>
         <div class="help-step-desc">
-          ใส่ค่า build ปัจจุบัน vs build ใหม่ที่จะอัพเกรด<br>
-          ระบบจะคำนวณว่า build ใหม่เพิ่ม damage กี่ %<br>
-          <span style="color:var(--accent)">ช่วยตัดสินใจซื้อ/อัพเกรดอุปกรณ์ได้คุ้มค่า</span>
+          ดูค่าจากในเกม → คอลัมน์ <b>"โจมตี"</b> และ <b>"คริติคอล"</b><br><br>
+          <b style="color:#c8963c">⚔ Offensive:</b><br>
+          • <b>ATK</b> โจมตี — ไม่มี cap เพิ่มได้เรื่อยๆ<br>
+          • <b>เจาะเกราะ</b> — ลด DEF ศัตรู (ระบบบอก "พอดี" ที่เท่าไหร่)<br>
+          • <b>ทำลายโล่</b> — ต้องข้าม ⅓ ของโล่ศัตรูถึงจะคุ้ม<br>
+          • <b>โจมตีธาตุ</b> — ดาเมจทะลุโล่ตรงๆ<br>
+          • <b>ข่มสำนัก</b> — ต้องมากกว่าป้องสำนักศัตรู<br>
+          • <b>แม่นยำ</b> — มี cap ขึ้นอยู่กับ Block ศัตรู<br><br>
+          <b style="color:#f0c040">💥 Critical:</b><br>
+          • <b>คริติคอล</b> — แนะนำ 1,500-2,500<br>
+          • <b>ดาเมจคริ %</b> — ขั้นต่ำ 150%
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body">
+        <div class="help-step-title">โหมด DPS — แก้ค่าศัตรู</div>
+        <div class="help-step-desc">
+          ด้านบนของหน้ามี <b>🛡 ศัตรู</b> — กดปุ่ม <b>"แก้ไข ▾"</b><br>
+          ใส่ค่าของศัตรูที่จะตี (DEF, โล่, ต้านธาตุ, หลบ ฯลฯ)<br>
+          กด <b style="color:var(--ok)">✓ บันทึกค่าศัตรู</b> เพื่อจดจำไว้<br><br>
+          <span style="color:var(--fg-3);font-size:11px">ค่าศัตรูจะอัพเดทผลคำนวณทันที</span>
         </div>
       </div></div>
 
       <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body">
-        <div class="help-step-title">บันทึก Build</div>
+        <div class="help-step-title">โหมด Tank/Bruiser</div>
         <div class="help-step-desc">
-          สามารถบันทึก build ที่คำนวณไว้เพื่อเปรียบเทียบในอนาคตได้<br>
-          <span style="color:var(--fg-3);font-size:11px">ข้อมูลเก็บใน browser ของคุณ — ไม่ sync ข้ามเครื่อง</span>
+          เปลี่ยนแท็บเป็น <b style="color:#4a9edd">Tank / Bruiser</b> ด้านบน<br><br>
+          ใส่ค่าจากคอลัมน์ <b>"ป้องกัน"</b>:<br>
+          • <b>HP</b> — พลังชีวิตรวม<br>
+          • <b>ป้องกัน (DEF)</b> — แนะนำ 2,500-4,500<br>
+          • <b>โล่พลังชี</b> — แนะนำ 2,500-3,500 (ดูด ATK ก่อนเข้า HP)<br>
+          • <b>ป้องกันสำนัก</b> — กันข่มสำนักศัตรู<br>
+          • <b>ต้านทานธาตุ</b> — แนะนำ 300-600+<br>
+          • <b>หลบ (Block)</b> — แนะนำ 700-1,000<br>
+          • <b>ลดดาเมจ %</b> — แนะนำ 15-35%<br>
+          • <b>ต้านคริ</b> — แนะนำ 500+<br><br>
+          <span style="color:var(--accent)">⚠ ศัตรูในโหมด Tank คือ DPS ที่จะมาตีเรา</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-body">
+        <div class="help-step-title">โหมด Healer</div>
+        <div class="help-step-desc">
+          เปลี่ยนแท็บเป็น <b style="color:#4caf78">Healer</b> ด้านบน<br><br>
+          มี 2 ส่วน:<br><br>
+          <b style="color:#4caf78">⚕ การรักษา:</b><br>
+          • <b>ATK</b> — ฐานคำนวณรักษา<br>
+          • <b>โบนัสการรักษา</b> — บวกตรงกับ ATK<br>
+          • <b>% โบนัสรักษา</b> — multiplier คูณท้ายสุด<br>
+          • <b>คริติคอล</b> — คริฮีลคูณ ×1.25 (ไม่ใช่ ×1.5)<br>
+          • <b>ตัวคูณสกิล</b> — ดูจากหน้าสกิลในเกม<br><br>
+          <b style="color:#4a9edd">🛡 ป้องกัน:</b> Healer ต้องอยู่รอด<br>
+          ใส่ค่าเดียวกับ Tank — HP, DEF, โล่, ต้านธาตุ ฯลฯ<br><br>
+          <span style="color:var(--fg-3);font-size:11px">ระบบคำนวณว่าฮีลตัวเองทันไหมเทียบกับดาเมจที่รับ</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">6</div><div class="help-step-body">
+        <div class="help-step-title">อ่านผลคำนวณ — Result Strip</div>
+        <div class="help-step-desc">
+          แถบผลลัพธ์ด้านล่าง stat panel จะแสดง:<br><br>
+          <b style="color:#d94040">DPS:</b> Physical รอด% / Element รอด% / ทะลุ Block / คริสุทธิ / สมดุล<br>
+          <b style="color:#4a9edd">Tank:</b> ลด Physical / ลด Element / อัตราบล็อก / จุดอ่อนหลัก / เฉลี่ย/ตี<br>
+          <b style="color:#4caf78">Heal:</b> รักษา/ครั้ง / รักษาคริ/ครั้ง / เฉลี่ย/ครั้ง / Survival<br><br>
+          <span style="color:var(--accent)">สีเขียว = ดี · สีส้ม = ระวัง · สีแดง = ต้องแก้</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">7</div><div class="help-step-body">
+        <div class="help-step-title">3 แท็บวิเคราะห์</div>
+        <div class="help-step-desc">
+          ด้านล่างของแต่ละโหมดมี 3 แท็บ:<br><br>
+          <div style="display:grid;gap:6px;margin-top:4px">
+            <div style="padding:8px 12px;background:var(--bg-2);border-left:3px solid var(--ok);border-radius:6px;font-size:11px">
+              <b>✅ Checklist</b> — เช็คว่า build ผ่านเกณฑ์อะไรบ้าง พร้อมบอกว่าขาดเท่าไหร่
+            </div>
+            <div style="padding:8px 12px;background:var(--bg-2);border-left:3px solid var(--accent);border-radius:6px;font-size:11px">
+              <b>🗺 Journey</b> — แสดง progress bar ของแต่ละ stat เทียบกับเป้าหมาย
+            </div>
+            <div style="padding:8px 12px;background:var(--bg-2);border-left:3px solid var(--err);border-radius:6px;font-size:11px">
+              <b>📊 Priority</b> — แนะนำว่าควรอัพอะไรก่อน (เรียงตาม gain สูงสุด)
+            </div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">8</div><div class="help-step-body">
+        <div class="help-step-title">Tier Card — ประเมิน build</div>
+        <div class="help-step-desc">
+          ด้านบนของผลคำนวณ มี <b>Tier Card</b> แสดงคะแนน build:<br><br>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:4px">
+            <div style="padding:6px;background:linear-gradient(135deg,rgba(240,192,64,.2),rgba(232,181,90,.1));border:1px solid rgba(240,192,64,.5);border-radius:6px;font-size:10px;text-align:center;font-weight:700;color:#f0c040">S</div>
+            <div style="padding:6px;background:rgba(76,175,120,.1);border:1px solid rgba(76,175,120,.4);border-radius:6px;font-size:10px;text-align:center;font-weight:700;color:#4caf78">A</div>
+            <div style="padding:6px;background:rgba(74,158,221,.1);border:1px solid rgba(74,158,221,.3);border-radius:6px;font-size:10px;text-align:center;font-weight:700;color:#4a9edd">B</div>
+            <div style="padding:6px;background:rgba(224,130,58,.1);border:1px solid rgba(224,130,58,.3);border-radius:6px;font-size:10px;text-align:center;font-weight:700;color:#e0823a">C</div>
+            <div style="padding:6px;background:rgba(217,64,64,.1);border:1px solid rgba(217,64,64,.35);border-radius:6px;font-size:10px;text-align:center;font-weight:700;color:#d94040">D</div>
+          </div>
+          <div style="margin-top:8px">
+            พร้อม insights บอก <b style="color:#72d498">จุดแข็ง</b> และ <b style="color:#e87070">จุดอ่อน</b> ของ build
+          </div>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">9</div><div class="help-step-body">
+        <div class="help-step-title">ไอคอน ★ — ดูที่ไหนในเกม</div>
+        <div class="help-step-desc">
+          ทุก stat มีไอคอน <b style="color:var(--accent)">★</b> เล็กๆ ข้างชื่อ<br>
+          <b>วางเมาส์</b> (PC) หรือ <b>กดค้าง</b> (มือถือ) → จะบอกว่าหา stat นั้นได้ที่ไหนในเกม<br><br>
+          <span style="color:var(--fg-3);font-size:11px">เช่น "ดูในเกม: คอลัมน์ 'โจมตี' → 'เจาะเกราะ' (破防)"</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">10</div><div class="help-step-body">
+        <div class="help-step-title">บันทึกข้อมูล</div>
+        <div class="help-step-desc">
+          ค่าทั้งหมดถูกบันทึกอัตโนมัติใน browser ของคุณ<br>
+          เปิด Calculator ครั้งหน้า จะมีค่าเดิมอยู่<br><br>
+          ปุ่ม <b style="color:var(--ok)">💾 บันทึก</b> (Heal mode) และ <b style="color:var(--ok)">✓ บันทึกค่าศัตรู</b> ใช้สำหรับยืนยันค่าที่ตั้งไว้<br><br>
+          <span style="color:var(--err);font-size:11px">⚠ ข้อมูลเก็บใน browser เครื่องนี้เท่านั้น — ไม่ sync ข้ามเครื่อง</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">11</div><div class="help-step-body">
+        <div class="help-step-title">Skill Guide</div>
+        <div class="help-step-desc">
+          ด้านบนของ Calculator มีลิงก์ไป <b>Skill Guide</b><br>
+          ดูข้อมูลทักษะ ตัวคูณ และสกิลของแต่ละ class ได้
         </div>
       </div></div>
     </div>
