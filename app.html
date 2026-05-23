@@ -1434,7 +1434,12 @@ input[type="file"] { display: none; }
   .stat-bar { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
-  .gw-nav { display: none; }
+  .gw-nav { 
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
   .reserve-grid { grid-template-columns: repeat(2, 1fr); }
 }
   background:linear-gradient(135deg,#050300 0%,#1a0d00 40%,#0a0500 70%,#050300 100%) !important;
