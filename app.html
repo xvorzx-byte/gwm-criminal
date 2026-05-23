@@ -4099,24 +4099,8 @@ window._resSearch='';
 window._resClsFilter='all';
 window._resSel=new Set();
 
-function setResSearch(v){
-  window._resSearch=v;
-  const input=document.getElementById('reserve-search');
-  if(input&&input.value!==v)input.value=v;
-  if(input){
-    const wrap=input.closest('.reserve-search-wrap');
-    if(wrap)wrap.classList.toggle('has-value',!!v);
-  }
-  const grid=document.getElementById('reserve-grid');
-  if(!grid)return;
-  const rows=grid.querySelectorAll('.reserve-row');
-  const kw=(v||'').toLowerCase();
-  rows.forEach(el=>{
-    const name=(el.querySelector('.rname')||{}).textContent||'';
-    const cls=(el.querySelector('.cls-badge')||{}).textContent||'';
-    el.style.display=(!kw||name.toLowerCase().includes(kw)||cls.toLowerCase().includes(kw))?'':'none';
-  });
-}
+const cpText=m.cp>0?`<span style="font-family:var(--mono);font-size:11px;color:var(--fg-2);min-width:36px;text-align:right;flex-shrink:0">${fmtCP(m.cp)}</span>`:'';
+    const editBtn=canEdit?`<button class="zm-edit"
 function setResClsFilter(v){window._resClsFilter=v;reRenderReserve();}
 
 /* ── UNIFIED SELECTION SYSTEM (Phase 1: Click-to-Select) ─────
