@@ -1496,6 +1496,7 @@ input[type="file"] { display: none; }
   .btn-settings-nav { display: none; }
   .divider { display: none; }
   .brand-title h1 { font-size: 12px; }
+  .exit-btn { display: none; }
 }  
 .soj-theme .gw-header::before{
   content:'';position:absolute;inset:0;
@@ -6938,7 +6939,7 @@ function renderUserBar() {
     <div class="user-avatar">${avatarInner}</div>
     <span class="user-name">${_session.displayName}</span>
     <span class="role-tag ${_session.role}">${roleLabel[_session.role]}</span>
-    <a href="/auth/logout" style="font-size:10px;color:var(--fg-3);text-decoration:none;padding:3px 8px;border-radius:4px;border:1px solid var(--line);margin-left:2px;transition:all .12s;display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-weight:500;letter-spacing:.04em" onmouseover="this.style.color='var(--err)';this.style.borderColor='oklch(0.70 0.18 22 / 0.5)'" onmouseout="this.style.color='var(--fg-3)';this.style.borderColor='var(--line)'">
+    <a href="/auth/logout" style="font-size:10px;color:var(--fg-3);text-decoration:none;padding:3px 8px;border-radius:4px;border:1px solid var(--line);margin-left:2px;transition:all .12s;display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-weight:500;letter-spacing:.04em" class="exit-btn" onmouseover="this.style.color='var(--err)';this.style.borderColor='oklch(0.70 0.18 22 / 0.5)'" onmouseout="this.style.color='var(--fg-3)';this.style.borderColor='var(--line)'">
       <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11l3-3-3-3"/><path d="M13 8H6"/><path d="M9 14H3V2h6"/></svg>
       Exit
     </a>
