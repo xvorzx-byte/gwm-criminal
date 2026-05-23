@@ -5958,13 +5958,15 @@ function switchStatsTab(tab){
 }
 
 function openHelp(){
-  showModal(`<div class="modal xl"><h3>📖 คู่มือการใช้งาน Guild OS</h3>
+  showModal(`<div class="modal xl"><h3>📖 คู่มือการใช้งาน Guild OS — v1.46</h3>
     <div class="help-nav">
-      <button class="help-tab active" onclick="switchHelp('login',this)">🔐 เข้าใช้งาน</button>
+      <button class="help-tab active" onclick="switchHelp('login',this)">🔐 เริ่มต้น</button>
       <button class="help-tab" onclick="switchHelp('member',this)">👤 สมาชิก</button>
-      <button class="help-tab" onclick="switchHelp('excel',this)">📊 Import</button>
       <button class="help-tab" onclick="switchHelp('war',this)">⚔ จัด War</button>
+      <button class="help-tab" onclick="switchHelp('attendance',this)">📅 Attendance</button>
       <button class="help-tab" onclick="switchHelp('cooking',this)">🍳 Cooking</button>
+      <button class="help-tab" onclick="switchHelp('calc',this)">🧮 Calculator</button>
+      <button class="help-tab" onclick="switchHelp('excel',this)">📊 Import</button>
       <button class="help-tab" onclick="switchHelp('admin',this)">🛡 Admin</button>
     </div>
 
@@ -6264,7 +6266,7 @@ function openHelp(){
 }
 
 function switchHelp(tab,btn){
-  ['login','member','excel','war','cooking','admin'].forEach(t=>{
+  ['login','member','excel','war','attendance','cooking','calc','admin'].forEach(t=>{
     const el=document.getElementById('help-'+t);
     if(el) el.style.display=(t===tab?'':'none');
   });
