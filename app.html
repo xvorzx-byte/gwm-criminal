@@ -3821,7 +3821,7 @@ function renderZone(z){
     const col=c?c.color:'var(--fg-3)';
     const a=m.attend||'ready';
     const statusCol=a==='ready'?'var(--ok)':a==='absent'?'var(--err)':a==='leave'?'oklch(0.68 0.16 290)':'var(--warn)';
-    const clsBadge=m.cls?`<span class="cls-badge cls-${m.cls}" data-tip="${m.cls}" style="font-size:10px;cursor:help">${m.cls.slice(0,4)}</span>`:'';
+    const clsBadge=m.cls?`<span class="cls-badge cls-${m.cls}" data-tip="${m.cls}" style="font-size:10px;cursor:help;margin-left:auto;flex-shrink:0">${m.cls.slice(0,4)}</span>`:'';
     const roleBadge='';
     const cpText=m.cp>0?`<span style="font-family:var(--mono);font-size:11px;color:var(--fg-2)">${fmtCP(m.cp)}</span>`:'';
     const editBtn=canEdit?`<button class="zm-edit" onclick="event.stopPropagation();editM('${m.id}')" title="แก้ไข / Note"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-9 9H2v-3z"/></svg></button>`:'';
