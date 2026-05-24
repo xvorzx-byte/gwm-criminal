@@ -6097,6 +6097,7 @@ function openHelp(){
       <button class="help-tab" onclick="switchHelp('cooking',this)">🍳 Cooking</button>
       <button class="help-tab" onclick="switchHelp('calc',this)">🧮 Calculator</button>
       <button class="help-tab" onclick="switchHelp('excel',this)">📊 Import</button>
+      <button class="help-tab" onclick="switchHelp('install',this)">📲 ติดตั้ง App</button>
       <button class="help-tab" onclick="switchHelp('admin',this)">🛡 Admin</button>
     </div>
 
@@ -6549,6 +6550,74 @@ function openHelp(){
       </div></div>
     </div>
 
+    <!-- TAB: Install App -->
+    <div id="help-install" style="display:none">
+      <div class="help-tip">💡 ติดตั้ง Guild OS เป็น App บนหน้าจอมือถือ — ใช้งานเหมือน app ปกติ ไม่ต้องเปิด browser</div>
+
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body">
+        <div class="help-step-title">เปิดเว็บใน Safari (iPhone)</div>
+        <div class="help-step-desc">
+          เปิดเว็บนี้ใน <b style="color:#0a84ff">Safari</b> เท่านั้น<br>
+          <span style="color:var(--err);font-size:11px">⚠ Chrome บน iPhone ไม่รองรับการติดตั้ง — ต้องใช้ Safari</span><br><br>
+          Login ตามปกติให้เรียบร้อยก่อน
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body">
+        <div class="help-step-title">เปิดเมนู Share</div>
+        <div class="help-step-desc">
+          กดที่สัญลักษณ์ <b style="color:#0a84ff">"..."</b> ด้านบนของ Safari<br>
+          แล้วกดปุ่ม <b>📤 Share</b><br><br>
+          <span style="color:var(--fg-3);font-size:11px">บางรุ่นจะมีปุ่ม Share อยู่ด้านล่างของจอ</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body">
+        <div class="help-step-title">เลือก "Add to Home Screen"</div>
+        <div class="help-step-desc">
+          Pop up Share จะเปิดขึ้นมา → เลื่อนหาเมนู <b>"Add to Home Screen"</b><br>
+          ถ้าไม่เจอ → กด <b style="color:var(--accent)">"View More"</b> ด้านล่าง<br>
+          แล้วเลือก <b>➕ Add to Home Screen</b>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body">
+        <div class="help-step-title">ตั้งชื่อ App</div>
+        <div class="help-step-desc">
+          ตั้งชื่อ App ตามที่ต้องการ หรือใช้ชื่อ default = <b style="color:var(--accent)">GWM</b><br>
+          กด <b style="color:#0a84ff">Add</b> ที่มุมขวาบน
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-body">
+        <div class="help-step-title">เสร็จแล้ว!</div>
+        <div class="help-step-desc">
+          กลับไปที่หน้า Home → จะเห็น icon <b style="color:var(--accent)">GWM</b> 🐉<br>
+          กดเข้าใช้งานได้เลย — เปิดเต็มจอเหมือน app ทั่วไป<br><br>
+          <span style="color:var(--ok);font-size:11px">✅ ไม่ต้องผ่าน Safari อีกต่อไป</span><br>
+          <span style="color:var(--ok);font-size:11px">✅ มี icon บนหน้าจอ home</span><br>
+          <span style="color:var(--ok);font-size:11px">✅ Update อัตโนมัติเมื่อมีเวอร์ชั่นใหม่</span>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">📱</div><div class="help-step-body">
+        <div class="help-step-title">Android (Chrome)</div>
+        <div class="help-step-desc">
+          บน Android จะมี popup เด้งถามให้ install อัตโนมัติ<br>
+          ถ้าไม่เด้ง → กด menu (จุด 3 จุดมุมขวาบน) → <b>"Install app"</b> หรือ <b>"Add to Home screen"</b>
+        </div>
+      </div></div>
+
+      <div class="help-step"><div class="help-step-num">💻</div><div class="help-step-body">
+        <div class="help-step-title">PC (Chrome / Edge)</div>
+        <div class="help-step-desc">
+          ใน URL bar ด้านบน จะมีปุ่ม <b style="color:var(--accent)">"⤓ Install"</b><br>
+          กดเพื่อติดตั้งเป็น app บน desktop<br><br>
+          <span style="color:var(--fg-3);font-size:11px">เปิดได้จาก Start Menu / Taskbar เหมือน app ปกติ</span>
+        </div>
+      </div></div>
+    </div>
+
     <!-- TAB: Admin -->
     <div id="help-admin" style="display:none">
       <div class="help-tip">💡 เฉพาะ Super Admin และ Sub-Admin เท่านั้น</div>
@@ -6601,7 +6670,7 @@ function openHelp(){
 }
 
 function switchHelp(tab,btn){
-  ['login','member','excel','war','attendance','cooking','calc','admin'].forEach(t=>{
+  ['login','member','excel','war','attendance','cooking','calc','install','admin'].forEach(t=>{
     const el=document.getElementById('help-'+t);
     if(el) el.style.display=(t===tab?'':'none');
   });
