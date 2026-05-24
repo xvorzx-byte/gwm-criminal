@@ -4,6 +4,17 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Guild War Manager</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GWM">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:#0a0805;font-family:'Segoe UI',system-ui,sans-serif}
@@ -33,5 +44,15 @@ h1{font-size:22px;font-weight:700;color:#f0e6c8;letter-spacing:2px;margin-bottom
   </a>
   <div class="note">เข้าใช้งานได้เฉพาะสมาชิก Discord Server ของกิลด์เท่านั้น<br>ข้อมูลจะถูกบันทึกบน Cloud ใช้ได้ทุกเครื่อง</div>
 </div>
+<script>
+/* PWA: Register Service Worker */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW registration failed:', err));
+  });
+}
+</script>
 </body>
 </html>
