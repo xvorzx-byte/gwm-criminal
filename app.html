@@ -103,7 +103,69 @@
 }
 [data-theme="wuxia"] .wuxia-decoration {
   display: block;
-}12);
+}
+
+@keyframes mapleDrift1 {
+  0% { transform: translate(0, -80px) rotate(0deg); opacity: 0; }
+  10%, 90% { opacity: 0.35; }
+  100% { transform: translate(60px, calc(100vh + 80px)) rotate(180deg); opacity: 0; }
+}
+@keyframes mapleDrift2 {
+  0% { transform: translate(0, -80px) rotate(0deg); opacity: 0; }
+  10%, 90% { opacity: 0.30; }
+  100% { transform: translate(-50px, calc(100vh + 80px)) rotate(-220deg); opacity: 0; }
+}
+@keyframes mapleDrift3 {
+  0% { transform: translate(0, -80px) rotate(15deg); opacity: 0; }
+  10%, 90% { opacity: 0.32; }
+  100% { transform: translate(80px, calc(100vh + 80px)) rotate(200deg); opacity: 0; }
+}
+
+.wuxia-leaf {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+}
+.wuxia-leaf.l1 { top: 0; left: 8%; animation: mapleDrift1 22s linear infinite; }
+.wuxia-leaf.l2 { top: 0; left: 28%; animation: mapleDrift2 26s linear infinite; animation-delay: -8s; }
+.wuxia-leaf.l3 { top: 0; left: 48%; animation: mapleDrift3 24s linear infinite; animation-delay: -15s; }
+.wuxia-leaf.l4 { top: 0; left: 68%; animation: mapleDrift1 28s linear infinite; animation-delay: -5s; }
+.wuxia-leaf.l5 { top: 0; left: 85%; animation: mapleDrift2 20s linear infinite; animation-delay: -12s; }
+.wuxia-leaf.l6 { top: 0; left: 15%; animation: mapleDrift3 30s linear infinite; animation-delay: -20s; }
+
+@keyframes mapleDrift1 {
+  0% { transform: translate(0, -80px) rotate(0deg); opacity: 0; }
+  10%, 90% { opacity: 0.35; }
+  100% { transform: translate(60px, calc(100vh + 80px)) rotate(180deg); opacity: 0; }
+}
+@keyframes mapleDrift2 {
+  0% { transform: translate(0, -80px) rotate(0deg); opacity: 0; }
+  10%, 90% { opacity: 0.30; }
+  100% { transform: translate(-50px, calc(100vh + 80px)) rotate(-220deg); opacity: 0; }
+}
+@keyframes mapleDrift3 {
+  0% { transform: translate(0, -80px) rotate(15deg); opacity: 0; }
+  10%, 90% { opacity: 0.32; }
+  100% { transform: translate(80px, calc(100vh + 80px)) rotate(200deg); opacity: 0; }
+}
+
+.wuxia-leaf {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+}
+.wuxia-leaf.l1 { top: 0; left: 8%; animation: mapleDrift1 22s linear infinite; }
+.wuxia-leaf.l2 { top: 0; left: 28%; animation: mapleDrift2 26s linear infinite; animation-delay: -8s; }
+.wuxia-leaf.l3 { top: 0; left: 48%; animation: mapleDrift3 24s linear infinite; animation-delay: -15s; }
+.wuxia-leaf.l4 { top: 0; left: 68%; animation: mapleDrift1 28s linear infinite; animation-delay: -5s; }
+.wuxia-leaf.l5 { top: 0; left: 85%; animation: mapleDrift2 20s linear infinite; animation-delay: -12s; }
+.wuxia-leaf.l6 { top: 0; left: 15%; animation: mapleDrift3 30s linear infinite; animation-delay: -20s; }12);
   --accent-line: oklch(0.74 0.13 75 / 0.45);
   --accent-fg: oklch(0.10 0.005 60);
   --gbg: oklch(0.13 0.006 60);
@@ -2466,6 +2528,14 @@ input[type="file"] { display: none; }
     <iframe id="cooking-iframe" src="" style="flex:1;border:none;width:100%;background:var(--bg-0);"></iframe>
   </div>
 
+  <div class="wuxia-decoration" id="wuxia-decoration" aria-hidden="true">
+    <img class="wuxia-leaf l1" src="assets/leaves/maple-1.png" alt=""/>
+    <img class="wuxia-leaf l2" src="assets/leaves/maple-4.png" alt=""/>
+    <img class="wuxia-leaf l3" src="assets/leaves/maple-7.png" alt=""/>
+    <img class="wuxia-leaf l4" src="assets/leaves/maple-2.png" alt=""/>
+    <img class="wuxia-leaf l5" src="assets/leaves/maple-8.png" alt=""/>
+    <img class="wuxia-leaf l6" src="assets/leaves/maple-5.png" alt=""/>
+  </div>
   <div class="gw-body">
     <div id="audit-log-panel" style="display:none"></div>
     <div id="stat-bar"></div>
