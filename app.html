@@ -2433,6 +2433,7 @@ input[type="file"] { display: none; }
           <button class="active" id="tw-dark" onclick="setTweak('theme','dark')">Dark</button>
           <button id="tw-light" onclick="setTweak('theme','light')">Light</button>
           <button id="tw-class" onclick="setTweak('theme','class')">Class</button>
+          <button id="tw-wuxia" onclick="setTweak('theme','wuxia')">Wuxia</button>
         </div>
       </div>
       <div class="tweak-section">
@@ -3146,7 +3147,7 @@ function setTweak(key, val) {
     _tweaks.theme = val;
     document.documentElement.dataset.theme = val;
     // update buttons
-    ['dark','light','class'].forEach(t => {
+    ['dark','light','class','wuxia'].forEach(t => {
       const btn = document.getElementById('tw-' + t);
       if (btn) btn.classList.toggle('active', t === val);
     });
