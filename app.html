@@ -92,6 +92,28 @@
   --gaccent: oklch(0.74 0.13 75);
 }
 
+/* Wuxia Decoration — hidden by default, shown only in wuxia theme */
+.wuxia-decoration {
+  display: none;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+[data-theme="wuxia"] .wuxia-decoration {
+  display: block;
+}12);
+  --accent-line: oklch(0.74 0.13 75 / 0.45);
+  --accent-fg: oklch(0.10 0.005 60);
+  --gbg: oklch(0.13 0.006 60);
+  --gcard: oklch(0.17 0.008 60);
+  --gt: oklch(0.92 0.020 80);
+  --gt2: oklch(0.62 0.032 70);
+  --gt3: oklch(0.46 0.025 65);
+  --gaccent: oklch(0.74 0.13 75);
+}
+
 [data-theme="class"] {
   --bg-0: oklch(0.14 0.018 270);
   --bg-1: oklch(0.20 0.022 270);
