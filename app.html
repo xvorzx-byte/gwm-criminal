@@ -2553,7 +2553,7 @@ input[type="file"] { display: none; }
         <div id="tw-push-send-status" style="font-size:10px;color:var(--fg-3);margin-top:4px;line-height:1.4"></div>
       </div>
 
-      <div class="tweak-section">
+      <div class="tweak-section" id="tw-notif-test-section" style="display:none">
         <div class="tweak-label">Notification (Beta)</div>
         <button onclick="testNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-1);font-size:12px;cursor:pointer;text-align:left;font-family:var(--sans)">🔔 ทดสอบ Notification</button>
         <div id="notif-status" style="font-size:10px;color:var(--fg-3);margin-top:6px;line-height:1.4"></div>
@@ -7415,6 +7415,11 @@ function renderUserBar() {
   if (isSuperAdmin()) {
     const twPushAdmin = document.getElementById('tw-push-admin-section');
     if (twPushAdmin) twPushAdmin.style.display = '';
+  }
+  // แสดง Notification test เฉพาะ Admin/Sub-Admin
+  if (isAdmin()) {
+    const twNotifTest = document.getElementById('tw-notif-test-section');
+    if (twNotifTest) twNotifTest.style.display = '';
   }
 }
 
