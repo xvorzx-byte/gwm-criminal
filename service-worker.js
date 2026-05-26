@@ -2,7 +2,7 @@
 // Strategy: Network-first (always check for updates)
 // Version: bump this when deploying new version
 
-const CACHE_VERSION = 'gwm-v1.46';
+const CACHE_VERSION = 'gwm-v1.47';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 
 // Files to precache (essential for offline)
@@ -60,5 +60,39 @@ self.addEventListener('fetch', (event) => {
         // Fallback to cache if network fails
         return caches.match(event.request);
       })
+  );
+});
+
+// Push: รับ push notification จาก server
+self.addEventListener('push', (event) => {
+  let data = { title: '🐉 Guild War', body: 'มีการแจ้งเตือนใหม่' };
+  try {
+    if (event.data) data = event.data.json();
+  } catch(e) {}
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || '🐉 Guild War', {
+      body: data.body || '',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      tag: data.tag || 'gwm-push',
+      data: data.url ? { url: data.url } : {},
+      vibrate: [200, 100, 200],
+      requireInteraction: data.requireInteraction || false
+    })
+  );
+});
+
+// Push click: เปิดหน้าเว็บเมื่อกด notification
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/app';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if (client.url.includes('/app') && 'focus' in client) return client.focus();
+      }
+      return clients.openWindow(url);
+    })
   );
 });
