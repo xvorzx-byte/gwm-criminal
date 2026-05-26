@@ -2850,7 +2850,10 @@ function defState(){
 
 let state = defState();
 
-let view='war';let _importData=[];let _assignSelected=new Set();let _assignClsFilter='all';
+const _hashView=window.location.hash.replace('#','');
+const _validViews=['war','roster','attendance','audit','cooking','calculator'];
+let view=_validViews.includes(_hashView)?_hashView:'war';
+let _importData=[];let _assignSelected=new Set();let _assignClsFilter='all';
 const _rmSel={};
 const _zoneSortMode={};
 
