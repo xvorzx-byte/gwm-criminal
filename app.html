@@ -2586,68 +2586,6 @@ input[type="file"] { display: none; }
         <div id="tw-schedule-status" style="font-size:10px;color:var(--fg-3);margin-top:4px"></div>
       </div>
 
-      /* ── Push Message Templates ── */
-async function loadPushTemplates() {
-  const sel = document.getElementById('tw-push-tpl');
-  if (!sel) return;
-  try {
-    const res = await fetch('/api/push/schedule');
-    const data = await res.json();
-    const templates = data.msgTemplates || [];
-    sel.innerHTML = '<option value="">— เลือก Template —</option>' +
-      templates.map((t, i) => `<option value="${i}">${t.title}</option>`).join('');
-    sel._templates = templates;
-  } catch(e) {}
-}
-
-function applyPushTemplate(idx) {
-  const sel = document.getElementById('tw-push-tpl');
-  if (!sel || idx === '') return;
-  const t = (sel._templates || [])[parseInt(idx)];
-  if (!t) return;
-  document.getElementById('tw-push-title').value = t.title;
-  document.getElementById('tw-push-msg').value = t.message;
-}
-
-async function savePushTemplate() {
-  const title = document.getElementById('tw-push-title').value.trim();
-  const message = document.getElementById('tw-push-msg').value.trim();
-  const status = document.getElementById('tw-push-send-status');
-  if (!title || !message) {
-    status.textContent = '❌ กรอกหัวข้อและข้อความก่อน';
-    status.style.color = 'var(--err)';
-    return;
-  }
-  try {
-    const res = await fetch('/api/push/schedule');
-    const data = await res.json();
-    const templates = data.msgTemplates || [];
-    if (templates.find(t => t.title === title)) {
-      status.textContent = '⚠️ มี template ชื่อนี้แล้ว';
-      status.style.color = 'var(--warn)';
-      return;
-    }
-    templates.push({ title, message });
-    await fetch('/api/push/schedule', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ msgTemplates: templates })
-    });
-    status.textContent = '✅ บันทึก Template แล้ว';
-    status.style.color = 'var(--ok)';
-    await loadPushTemplates();
-  } catch(e) {
-    status.textContent = '❌ ' + e.message;
-    status.style.color = 'var(--err)';
-  }
-}
-
-async function deletePushTemplate() {
-  const sel = document.getElementById('tw-push-tpl');
-  const status = document.getElementById('tw-push-send-status');
-  if (!sel || sel.value === '') {
-    status.textContent = '❌ เลือก Template ที่จะลบก่อน';
-
       <div class="tweak-section" id="tw-notif-test-section" style="display:none">
         <div class="tweak-label">Notification (Beta)</div>
         <button onclick="testNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-1);font-size:12px;cursor:pointer;text-align:left;font-family:var(--sans)">🔔 ทดสอบ Notification</button>
