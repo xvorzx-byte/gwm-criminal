@@ -140,8 +140,8 @@ export async function onRequest(context) {
 
   /* ── War ปกติ (20:00) ── */
   if (schedule.warEnabled && schedule.warDate) {
-    const war60 = new Date(schedule.warDate + 'T19:00:00+07:00').getTime();
-    const war15 = new Date(schedule.warDate + 'T19:45:00+07:00').getTime();
+    const war60 = new Date(schedule.warDate + 'T12:00:00Z').getTime();
+    const war15 = new Date(schedule.warDate + 'T12:45:00Z').getTime();
     const window = 5 * 60 * 1000; /* 5 นาที */
 
     if (Math.abs(now - war60) < window && schedule.lastSentWar !== '60') {
@@ -162,7 +162,9 @@ export async function onRequest(context) {
 
   /* ── ซ้อมวอร์ ── */
   if (schedule.practiceEnabled && schedule.practiceDate && schedule.practiceTime) {
-    const practiceStart = new Date(`${schedule.practiceDate}T${schedule.practiceTime}:00+07:00`).getTime();
+    const [ph, pm] = schedule.practiceTime.split(':').map(Number);
+    const practiceUTCHour = ph - 7 < 0 ? ph - 7 + 24 : ph - 7;
+    const practiceStart = new Date(`${schedule.practiceDate}T${String(practiceUTCHour).padStart(2,'0')}:${String(pm).padStart(2,'0')}:00Z`).getTime();
     const p30 = practiceStart - 30 * 60 * 1000;
     const p5 = practiceStart - 5 * 60 * 1000;
     const window = 5 * 60 * 1000;
