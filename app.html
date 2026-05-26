@@ -2586,6 +2586,23 @@ input[type="file"] { display: none; }
         <div id="tw-schedule-status" style="font-size:10px;color:var(--fg-3);margin-top:4px"></div>
       </div>
 
+      <div class="tweak-section" id="tw-push-admin-section" style="display:none">
+        <div class="tweak-label">📢 ส่ง Push Notification</div>
+        <select id="tw-push-tpl" onchange="applyPushTemplate(this.value)" style="width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-1);font-size:11px;font-family:var(--sans);margin-bottom:4px">
+          <option value="">— เลือก Template —</option>
+        </select>
+        <input id="tw-push-title" type="text" placeholder="หัวข้อ เช่น ⚔️ War เริ่มแล้ว!" maxlength="60"
+          style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans);margin-bottom:4px"/>
+        <textarea id="tw-push-msg" placeholder="ข้อความ เช่น เตรียมตัวเข้าสู้ได้เลย!" maxlength="120" rows="2"
+          style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans);resize:none;margin-bottom:4px"></textarea>
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <button onclick="savePushTemplate()" style="flex:1;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-2);font-size:11px;cursor:pointer;font-family:var(--sans)">💾 Save Template</button>
+          <button onclick="deletePushTemplate()" style="padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--err);font-size:11px;cursor:pointer;font-family:var(--sans)">🗑</button>
+        </div>
+        <button onclick="sendPushNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:600">📡 ส่งหาทุกคน</button>
+        <div id="tw-push-send-status" style="font-size:10px;color:var(--fg-3);margin-top:4px;line-height:1.4"></div>
+      </div>
+
       <div class="tweak-section" id="tw-notif-test-section" style="display:none">
         <div class="tweak-label">Notification (Beta)</div>
         <button onclick="testNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-1);font-size:12px;cursor:pointer;text-align:left;font-family:var(--sans)">🔔 ทดสอบ Notification</button>
