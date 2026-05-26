@@ -2543,6 +2543,11 @@ input[type="file"] { display: none; }
           <div class="toggle-sw on" id="tw-stats" onclick="setTweak('stats',null)"></div>
         </div>
       </div>
+      <div class="tweak-section">
+        <div class="tweak-label">Notification (Beta)</div>
+        <button onclick="testNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-1);font-size:12px;cursor:pointer;text-align:left;font-family:var(--sans)">🔔 ทดสอบ Notification</button>
+        <div id="notif-status" style="font-size:10px;color:var(--fg-3);margin-top:6px;line-height:1.4"></div>
+      </div>
     </div>
   </div>
 
@@ -7771,6 +7776,70 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.log('SW registration failed:', err));
   });
+}
+
+/* Notification Test (Phase B Step 1A) */
+function _setNotifStatus(msg, color) {
+  const el = document.getElementById('notif-status');
+  if (el) {
+    el.textContent = msg;
+    el.style.color = color || 'var(--fg-3)';
+  }
+}
+
+async function testNotification() {
+  /* Check browser support */
+  if (!('Notification' in window)) {
+    toast('Browser นี้ไม่รองรับ Notification', 'err');
+    _setNotifStatus('❌ Browser ไม่รองรับ', 'var(--err)');
+    return;
+  }
+
+  /* Check current permission */
+  let permission = Notification.permission;
+  _setNotifStatus('สถานะ: ' + permission);
+
+  /* Request permission if needed */
+  if (permission === 'default') {
+    _setNotifStatus('กำลังขอ permission...');
+    permission = await Notification.requestPermission();
+  }
+
+  /* Handle denied */
+  if (permission === 'denied') {
+    toast('Notification ถูกปิด - เปิดในการตั้งค่าก่อน', 'warn');
+    _setNotifStatus('❌ ถูกปิด - เปิดใน Settings ของมือถือ', 'var(--err)');
+    return;
+  }
+
+  /* Permission granted - send test notification */
+  if (permission === 'granted') {
+    try {
+      /* Try via service worker first (works when app closed) */
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.showNotification('🐉 GWM Test', {
+          body: 'ทดสอบ Notification สำเร็จ! ระบบพร้อมใช้งาน',
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-192.png',
+          tag: 'gwm-test',
+          requireInteraction: false,
+          vibrate: [200, 100, 200]
+        });
+      } else {
+        /* Fallback to direct Notification */
+        new Notification('🐉 GWM Test', {
+          body: 'ทดสอบ Notification สำเร็จ! ระบบพร้อมใช้งาน',
+          icon: '/icons/icon-192.png'
+        });
+      }
+      toast('ส่ง Notification แล้ว!', 'ok');
+      _setNotifStatus('✅ ส่งสำเร็จ - เช็คดูที่ notification bar', 'var(--ok)');
+    } catch (err) {
+      toast('Error: ' + err.message, 'err');
+      _setNotifStatus('❌ ' + err.message, 'var(--err)');
+    }
+  }
 }
 </script>
 </body>
