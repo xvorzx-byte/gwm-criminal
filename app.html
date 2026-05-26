@@ -3423,6 +3423,11 @@ function closeCookingGuide() {
 // เปิด cooking อัตโนมัติถ้า URL มี #cooking
 window.addEventListener("load", function() {
   if (window.location.hash === "#cooking") openCookingGuide();
+  else {
+    const hashView = window.location.hash.replace('#','');
+    const validViews=['war','roster','attendance','audit','cooking','calculator'];
+    if(validViews.includes(hashView)) setView(hashView);
+  }
 });
 
 function openGuildEdit(){
@@ -3451,6 +3456,11 @@ function setView(v){
     const id=b.id||'';
     b.classList.toggle('active', id===`nav-${v}`);
   });
+  /* บันทึก view ใน URL hash */
+  const validViews=['war','roster','attendance','audit','cooking','calculator'];
+  if(validViews.includes(v)){
+    history.replaceState(null,'',`#${v}`);
+  }
   render();
 }
 function getMZ(id){for(const z of state.zones)if(z.members.includes(id))return z.id;return null;}
