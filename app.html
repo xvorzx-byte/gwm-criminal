@@ -3,7 +3,7 @@
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0a0a0f">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GWM">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -2490,7 +2490,7 @@ input[type="file"] { display: none; }
       <input type="file" id="logo-file-input" accept="image/*" onchange="handleLogoUpload(this)"/>
       <div class="brand-title" onclick="openGuildEdit()" title="คลิกเพื่อแก้ไข" style="cursor:pointer">
         <h1 id="guild-name-display">GUILD WAR MANAGER</h1>
-        <span class="meta" id="guild-sub-display">Season 1 · 2026-04-13 · v1.46</span>
+        <span class="meta" id="guild-sub-display">Season 1 · 2026-04-13 · v1.47</span>
       </div>
     </div>
 
@@ -2641,7 +2641,7 @@ input[type="file"] { display: none; }
       <span class="gwos-sep">·</span>
       <span>made with <a href="https://www.anthropic.com/claude" target="_blank" rel="noopener" class="gwos-link">Claude</a></span>
       <span class="gwos-sep">·</span>
-      <span class="gwos-ver">v1.46</span>
+      <span class="gwos-ver" id="app-ver"></span>
     </footer>
   </div>
 </div>
@@ -2850,6 +2850,7 @@ function defState(){
 
 let state = defState();
 
+const APP_VERSION='v1.47';
 const _hashView=window.location.hash.replace('#','');
 const _validViews=['war','roster','attendance','audit','cooking','calculator'];
 let view=_validViews.includes(_hashView)?_hashView:'war';
@@ -3386,7 +3387,8 @@ function updateLogoDisplay(){
   const nm=document.getElementById('guild-name-display'),sb=document.getElementById('guild-sub-display');
   const brandMark=document.querySelector('.brand-mark');
   if(nm)nm.textContent=state.guildName||'GUILD WAR MANAGER';
-  if(sb)sb.textContent=(state.warName||'Season 1')+' · '+(state.warDate||'')+' · v1.46';
+  if(sb)sb.textContent=(state.warName||'Season 1')+' · '+(state.warDate||'')+' · '+APP_VERSION;
+  const av=document.getElementById('app-ver');if(av)av.textContent=APP_VERSION;
   if(state.guildLogoData){
     if(img){img.src=state.guildLogoData;img.style.display='block';}
     if(init)init.style.display='none';
@@ -6188,7 +6190,7 @@ function switchStatsTab(tab){
 }
 
 function openHelp(){
-  showModal(`<div class="modal xl"><h3>📖 คู่มือการใช้งาน Guild OS — v1.46</h3>
+  showModal(`<div class="modal xl"><h3>📖 คู่มือการใช้งาน Guild OS — '+APP_VERSION+'</h3>
     <div class="help-nav">
       <button class="help-tab active" onclick="switchHelp('login',this)">🔐 เริ่มต้น</button>
       <button class="help-tab" onclick="switchHelp('member',this)">👤 สมาชิก</button>
