@@ -106,6 +106,7 @@ export async function onRequest(context) {
 
   const payload = JSON.stringify({ title, body: message, url: url || '/app', tag: 'gwm-announce' });
   let sent = 0, failed = 0;
+  const failedDetails = [];
 
   for (const key of list.keys) {
     try {
@@ -130,7 +131,7 @@ export async function onRequest(context) {
       else {
         failed++;
         const errText = await res.text();
-        console.error(`Push failed [${res.status}]: ${errText} | endpoint: ${subscription.endpoint.slice(0,50)}`);
+        failedDetails.push({ status: res.status, body: errText, endpoint: subscription.endpoint.slice(0,60) });
         if (res.status === 410 || res.status === 404) {
           await KV.delete(key.name);
         }
@@ -138,7 +139,7 @@ export async function onRequest(context) {
     } catch(e) { failed++; }
   }
 
-  return new Response(JSON.stringify({ ok: true, sent, failed, total: list.keys.length }), {
+  return new Response(JSON.stringify({ ok: true, sent, failed, total: list.keys.length, errors: failedDetails }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
