@@ -2543,6 +2543,27 @@ input[type="file"] { display: none; }
           <div class="toggle-sw on" id="tw-stats" onclick="setTweak('stats',null)"></div>
         </div>
       </div>
+      <div class="tweak-section" id="tw-schedule-section" style="display:none">
+        <div class="tweak-label">⏰ Auto Push Schedule</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;color:var(--fg-1)">⚔️ War ปกติ (20:00)</span>
+            <div class="toggle-sw" id="tw-war-toggle" onclick="toggleWarSchedule()"></div>
+          </div>
+          <div style="font-size:10px;color:var(--fg-3)">แจ้งเตือน 19:00 และ 19:45 เฉพาะคนที่ assign zone</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;color:var(--fg-1)">🛡️ ซ้อมวอร์</span>
+            <div class="toggle-sw" id="tw-practice-toggle" onclick="togglePracticeSchedule()"></div>
+          </div>
+          <input id="tw-practice-date" type="date" style="width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans)"/>
+          <input id="tw-practice-time" type="time" style="width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans)"/>
+          <button onclick="savePracticeSchedule()" style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-1);font-size:12px;cursor:pointer;font-family:var(--sans)">💾 บันทึกซ้อมวอร์</button>
+        </div>
+        <div id="tw-schedule-status" style="font-size:10px;color:var(--fg-3);margin-top:4px"></div>
+      </div>
+
       <div class="tweak-section" id="tw-push-admin-section" style="display:none">
         <div class="tweak-label">📢 ส่ง Push Notification</div>
         <input id="tw-push-title" type="text" placeholder="หัวข้อ เช่น ⚔️ War เริ่มแล้ว!" maxlength="60"
@@ -7416,6 +7437,12 @@ function renderUserBar() {
     const twPushAdmin = document.getElementById('tw-push-admin-section');
     if (twPushAdmin) twPushAdmin.style.display = '';
   }
+  // แสดง Schedule section เฉพาะ Admin/Sub-Admin
+  if (isAdmin()) {
+    const twSchedule = document.getElementById('tw-schedule-section');
+    if (twSchedule) twSchedule.style.display = '';
+    loadScheduleUI();
+  }
   // แสดง Notification test เฉพาะ Admin/Sub-Admin
   if (isAdmin()) {
     const twNotifTest = document.getElementById('tw-notif-test-section');
@@ -7801,6 +7828,101 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.log('SW registration failed:', err));
   });
+}
+
+/* ── Auto Push Schedule UI ── */
+async function loadScheduleUI() {
+  try {
+    const res = await fetch('/api/push/schedule');
+    const s = await res.json();
+    const warToggle = document.getElementById('tw-war-toggle');
+    const practiceToggle = document.getElementById('tw-practice-toggle');
+    if (warToggle) {
+      warToggle.classList.toggle('on', !!s.warEnabled);
+    }
+    if (practiceToggle) {
+      practiceToggle.classList.toggle('on', !!s.practiceEnabled);
+    }
+    if (s.practiceDate) {
+      const pd = document.getElementById('tw-practice-date');
+      if (pd) pd.value = s.practiceDate;
+    }
+    if (s.practiceTime) {
+      const pt = document.getElementById('tw-practice-time');
+      if (pt) pt.value = s.practiceTime;
+    }
+    /* อัพเดท warDate จาก state */
+    if (typeof state !== 'undefined' && state.warDate) {
+      await fetch('/api/push/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ warDate: state.warDate })
+      });
+    }
+  } catch(e) {}
+}
+
+async function toggleWarSchedule() {
+  const toggle = document.getElementById('tw-war-toggle');
+  const status = document.getElementById('tw-schedule-status');
+  const newVal = !toggle.classList.contains('on');
+  toggle.classList.toggle('on', newVal);
+  try {
+    await fetch('/api/push/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ warEnabled: newVal, warDate: state.warDate })
+    });
+    status.textContent = newVal ? '✅ เปิด War notification แล้ว' : '⏸ ปิด War notification แล้ว';
+    status.style.color = newVal ? 'var(--ok)' : 'var(--fg-3)';
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--err)';
+  }
+}
+
+async function togglePracticeSchedule() {
+  const toggle = document.getElementById('tw-practice-toggle');
+  const status = document.getElementById('tw-schedule-status');
+  const newVal = !toggle.classList.contains('on');
+  toggle.classList.toggle('on', newVal);
+  try {
+    await fetch('/api/push/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ practiceEnabled: newVal })
+    });
+    status.textContent = newVal ? '✅ เปิด ซ้อมวอร์ notification แล้ว' : '⏸ ปิด ซ้อมวอร์ notification แล้ว';
+    status.style.color = newVal ? 'var(--ok)' : 'var(--fg-3)';
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--err)';
+  }
+}
+
+async function savePracticeSchedule() {
+  const date = document.getElementById('tw-practice-date').value;
+  const time = document.getElementById('tw-practice-time').value;
+  const status = document.getElementById('tw-schedule-status');
+  if (!date || !time) {
+    status.textContent = '❌ กรอกวันที่และเวลาก่อน';
+    status.style.color = 'var(--err)';
+    return;
+  }
+  try {
+    await fetch('/api/push/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ practiceDate: date, practiceTime: time, practiceEnabled: true, lastSentPractice: null })
+    });
+    const toggle = document.getElementById('tw-practice-toggle');
+    if (toggle) toggle.classList.add('on');
+    status.textContent = `✅ ตั้งซ้อมวอร์ ${date} เวลา ${time} แล้ว`;
+    status.style.color = 'var(--ok)';
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--err)';
+  }
 }
 
 /* ── Push Send UI (Phase B Step 1C) ── */
