@@ -1482,6 +1482,8 @@ html, body {
   max-height: calc(100vh - 70px);
 }
 .tweaks-panel.open { display: block; }
+.tweaks-backdrop { display: none; position: fixed; inset: 0; z-index: 199; }
+.tweaks-backdrop.open { display: block; }
 .tweaks-header {
   display: flex;
   align-items: center;
@@ -1492,7 +1494,7 @@ html, body {
 .tweaks-header span { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-1); }
 .tweaks-close { width: 22px; height: 22px; border: none; background: transparent; color: var(--fg-3); cursor: pointer; border-radius: 4px; display: grid; place-items: center; font-size: 12px; }
 .tweaks-close:hover { color: var(--fg-0); background: var(--bg-3); }
-.tweaks-body { padding: 10px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: calc(100vh - 120px); }
+.tweaks-body { padding: 10px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: calc(100vh - 120px); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .tweak-section { display: flex; flex-direction: column; gap: 6px; }
 .tweak-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-3); font-weight: 500; }
 .tweak-radio { display: flex; gap: 4px; }
@@ -2537,6 +2539,7 @@ input[type="file"] { display: none; }
   </header>
 
   <!-- Tweaks Panel -->
+  <div class="tweaks-backdrop" id="tweaks-backdrop" onclick="toggleTweaks()"></div>
   <div class="tweaks-panel" id="tweaks-panel">
     <div class="tweaks-header">
       <span>Tweaks</span>
@@ -3354,9 +3357,11 @@ function applyTweaksUI() {
 function toggleTweaks(e) {
   if (e) e.stopPropagation();
   const panel = document.getElementById('tweaks-panel');
+  const backdrop = document.getElementById('tweaks-backdrop');
   if (panel) {
-    panel.classList.toggle('open');
-    if (panel.classList.contains('open')) initPushBtn();
+    const isOpen = panel.classList.toggle('open');
+    if (backdrop) backdrop.classList.toggle('open', isOpen);
+    if (isOpen) initPushBtn();
   }
 }
 
