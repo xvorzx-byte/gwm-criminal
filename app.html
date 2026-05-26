@@ -3305,7 +3305,10 @@ function applyTweaksUI() {
 function toggleTweaks(e) {
   if (e) e.stopPropagation();
   const panel = document.getElementById('tweaks-panel');
-  if (panel) panel.classList.toggle('open');
+  if (panel) {
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) initPushBtn();
+  }
 }
 
 // Close tweaks when clicking outside
@@ -7837,6 +7840,25 @@ function urlBase64ToUint8Array(base64String) {
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = atob(base64);
   return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function initPushBtn() {
+  const btn = document.getElementById('tw-push-btn');
+  const status = document.getElementById('tw-push-status');
+  if (!btn) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      btn.textContent = '🔕 ปิด Push Notification';
+      status.textContent = '✅ เปิดอยู่';
+      status.style.color = 'var(--ok)';
+    } else {
+      btn.textContent = '📡 เปิด Push Notification';
+      status.textContent = '';
+    }
+  } catch(e) {}
 }
 
 async function togglePushSubscription() {
