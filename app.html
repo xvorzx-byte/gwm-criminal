@@ -2543,6 +2543,16 @@ input[type="file"] { display: none; }
           <div class="toggle-sw on" id="tw-stats" onclick="setTweak('stats',null)"></div>
         </div>
       </div>
+      <div class="tweak-section" id="tw-push-admin-section" style="display:none">
+        <div class="tweak-label">📢 ส่ง Push Notification</div>
+        <input id="tw-push-title" type="text" placeholder="หัวข้อ เช่น ⚔️ War เริ่มแล้ว!" maxlength="60"
+          style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans);margin-bottom:4px"/>
+        <textarea id="tw-push-msg" placeholder="ข้อความ เช่น เตรียมตัวเข้าสู้ได้เลย!" maxlength="120" rows="2"
+          style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans);resize:none;margin-bottom:4px"></textarea>
+        <button onclick="sendPushNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:600">📡 ส่งหาทุกคน</button>
+        <div id="tw-push-send-status" style="font-size:10px;color:var(--fg-3);margin-top:4px;line-height:1.4"></div>
+      </div>
+
       <div class="tweak-section">
         <div class="tweak-label">Notification (Beta)</div>
         <button onclick="testNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg-1);font-size:12px;cursor:pointer;text-align:left;font-family:var(--sans)">🔔 ทดสอบ Notification</button>
@@ -7398,6 +7408,11 @@ function renderUserBar() {
     const twSettings = document.getElementById('tw-settings-section');
     if (twSettings) twSettings.style.display = '';
   }
+  // แสดง Push Admin section เฉพาะ Super Admin
+  if (isSuperAdmin()) {
+    const twPushAdmin = document.getElementById('tw-push-admin-section');
+    if (twPushAdmin) twPushAdmin.style.display = '';
+  }
 }
 
 
@@ -7778,6 +7793,40 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.log('SW registration failed:', err));
   });
+}
+
+/* ── Push Send UI (Phase B Step 1C) ── */
+async function sendPushNotification() {
+  const title = document.getElementById('tw-push-title').value.trim();
+  const message = document.getElementById('tw-push-msg').value.trim();
+  const status = document.getElementById('tw-push-send-status');
+  if (!title || !message) {
+    status.textContent = '❌ กรอกหัวข้อและข้อความก่อน';
+    status.style.color = 'var(--err)';
+    return;
+  }
+  status.textContent = '⏳ กำลังส่ง...';
+  status.style.color = 'var(--fg-3)';
+  try {
+    const res = await fetch('/api/push/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, message, url: '/app' })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      status.textContent = `✅ ส่งสำเร็จ ${data.sent}/${data.total} คน`;
+      status.style.color = 'var(--ok)';
+      document.getElementById('tw-push-title').value = '';
+      document.getElementById('tw-push-msg').value = '';
+    } else {
+      status.textContent = '❌ ' + (data.error || 'unknown error');
+      status.style.color = 'var(--err)';
+    }
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--err)';
+  }
 }
 
 /* ── Push Subscription (Phase B Step 1B) ── */
