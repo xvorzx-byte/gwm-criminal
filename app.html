@@ -3450,7 +3450,7 @@ function openGuildEdit(){
     <div class="mrow"><button class="btn" id="ge-cancel">ยกเลิก</button><button class="btn cyan" id="ge-save">บันทึก</button></div>
   </div>`);
   document.getElementById('ge-cancel').onclick=()=>{closeModal();toast('ยกเลิก','cancel');};
-  document.getElementById('ge-save').onclick=()=>{state.guildName=document.getElementById('gn-name').value.trim()||state.guildName;state.warName=document.getElementById('gn-war').value.trim()||state.warName;state.warDate=document.getElementById('gn-date').value||state.warDate;save();updateLogoDisplay();render();closeModal();toast('บันทึก Guild Info!','ok');};
+  document.getElementById('ge-save').onclick=async()=>{state.guildName=document.getElementById('gn-name').value.trim()||state.guildName;state.warName=document.getElementById('gn-war').value.trim()||state.warName;state.warDate=document.getElementById('gn-date').value||state.warDate;save();updateLogoDisplay();render();closeModal();toast('บันทึก Guild Info!','ok');await syncWarDateToSchedule(state.warDate);};
 }
 
 function setView(v){
@@ -6838,7 +6838,7 @@ function openSettings(){
     <div class="mrow">${resetBtn}<button class="btn" id="s-cancel">ยกเลิก</button><button class="btn cyan" id="s-save">บันทึก</button></div>
   </div>`);
   document.getElementById('s-cancel').onclick=()=>{closeModal();toast('ยกเลิก','cancel');};
-  document.getElementById('s-save').onclick=()=>{state.warName=document.getElementById('s-n').value||state.warName;state.warDate=document.getElementById('s-d').value||state.warDate;save();updateLogoDisplay();render();closeModal();toast('บันทึก Settings!','ok');};
+  document.getElementById('s-save').onclick=async()=>{state.warName=document.getElementById('s-n').value||state.warName;state.warDate=document.getElementById('s-d').value||state.warDate;save();updateLogoDisplay();render();closeModal();toast('บันทึก Settings!','ok');await syncWarDateToSchedule(state.warDate);};
   document.getElementById('s-classmgr').onclick=()=>{closeModal();openClassManager();};
   const _getDefReq=()=>{const req={};ALL_ROLES.forEach(r=>{const v=parseInt(document.getElementById('sdr-'+r)?.value)||0;if(v>0)req[r]=v;});return req;};
   document.getElementById('s-savereq').onclick=()=>{
@@ -7469,8 +7469,8 @@ function renderUserBar() {
     const twSettings = document.getElementById('tw-settings-section');
     if (twSettings) twSettings.style.display = '';
   }
-  // แสดง Push Admin section เฉพาะ Super Admin
-  if (isSuperAdmin()) {
+  // แสดง Push Admin section เฉพาะ Admin/Sub-Admin
+  if (isAdmin()) {
     const twPushAdmin = document.getElementById('tw-push-admin-section');
     if (twPushAdmin) twPushAdmin.style.display = '';
   }
@@ -7865,6 +7865,18 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.log('SW registration failed:', err));
   });
+}
+
+/* ── Sync warDate to push schedule ── */
+async function syncWarDateToSchedule(warDate) {
+  if (!warDate || !isAdmin()) return;
+  try {
+    await fetch('/api/push/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ warDate, lastSentWar: null })
+    });
+  } catch(e) {}
 }
 
 /* ── Auto Push Schedule UI ── */
