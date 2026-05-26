@@ -1480,6 +1480,10 @@ html, body {
   overflow: hidden;
   display: none;
   max-height: calc(100vh - 70px);
+  touch-action: none;
+}
+.tweaks-body {
+  touch-action: pan-y;
 }
 .tweaks-panel.open { display: block; }
 .tweaks-backdrop { display: none; position: fixed; inset: 0; z-index: 199; touch-action: none; -webkit-user-select: none; }
