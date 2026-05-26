@@ -7780,6 +7780,70 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+/* ── Push Subscription (Phase B Step 1B) ── */
+const VAPID_PUBLIC_KEY = 'BIdqLPQkhwoez1-wm-9ns5dLlczZqrAndO3kX7aRJLUZxb_PkS8bmoRY2IeIVe7L4thjr-GjWQGxlyywTpk8Xlc';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function togglePushSubscription() {
+  const btn = document.getElementById('tw-push-btn');
+  const status = document.getElementById('tw-push-status');
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    status.textContent = '❌ Browser ไม่รองรับ Push';
+    status.style.color = 'var(--err)';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = '⏳ กำลังดำเนินการ...';
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      await existing.unsubscribe();
+      await fetch('/api/push/subscribe', { method: 'DELETE' });
+      btn.textContent = '📡 เปิด Push Notification';
+      status.textContent = '✅ ปิด Notification แล้ว';
+      status.style.color = 'var(--fg-3)';
+    } else {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        status.textContent = '❌ ไม่ได้รับ permission';
+        status.style.color = 'var(--err)';
+        btn.textContent = '📡 เปิด Push Notification';
+        btn.disabled = false;
+        return;
+      }
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+      const res = await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub.toJSON() })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        btn.textContent = '🔕 ปิด Push Notification';
+        status.textContent = '✅ Subscribe สำเร็จ!';
+        status.style.color = 'var(--ok)';
+      } else {
+        throw new Error(data.error || 'unknown');
+      }
+    }
+  } catch(e) {
+    status.textContent = '❌ Error: ' + e.message;
+    status.style.color = 'var(--err)';
+    btn.textContent = '📡 เปิด Push Notification';
+  }
+  btn.disabled = false;
+}
+
 /* Notification Test (Phase B Step 1A) */
 function _setNotifStatus(msg, color) {
   const el = document.getElementById('notif-status');
