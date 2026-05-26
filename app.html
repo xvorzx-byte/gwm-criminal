@@ -7853,8 +7853,13 @@ async function togglePushSubscription() {
     const reg = await navigator.serviceWorker.ready;
     const existing = await reg.pushManager.getSubscription();
     if (existing) {
+      const endpointToDelete = existing.endpoint;
       await existing.unsubscribe();
-      await fetch('/api/push/subscribe', { method: 'DELETE' });
+      await fetch('/api/push/subscribe', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: endpointToDelete })
+      });
       btn.textContent = '📡 เปิด Push Notification';
       status.textContent = '✅ ปิด Notification แล้ว';
       status.style.color = 'var(--fg-3)';
