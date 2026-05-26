@@ -173,8 +173,9 @@ export async function onRequest(context) {
       status: 401, headers: { 'Content-Type': 'application/json' }
     });
   }
-  const ADMIN_IDS = (env.ADMIN_IDS || '').split(',').map(s => s.trim());
-  if (!ADMIN_IDS.includes(session.userId) && session.userId !== '798922868917796874') {
+  const isAdminRole = session.role === 'admin' || session.role === 'sub_admin';
+  const isSuperAdmin = session.userId === '798922868917796874';
+  if (!isAdminRole && !isSuperAdmin) {
     return new Response(JSON.stringify({ error: 'forbidden' }), {
       status: 403, headers: { 'Content-Type': 'application/json' }
     });
