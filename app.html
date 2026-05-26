@@ -1482,7 +1482,7 @@ html, body {
   max-height: calc(100vh - 70px);
 }
 .tweaks-panel.open { display: block; }
-.tweaks-backdrop { display: none; position: fixed; inset: 0; z-index: 199; }
+.tweaks-backdrop { display: none; position: fixed; inset: 0; z-index: 199; touch-action: none; -webkit-user-select: none; }
 .tweaks-backdrop.open { display: block; }
 .tweaks-header {
   display: flex;
@@ -1499,7 +1499,7 @@ html, body {
 .tweak-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-3); font-weight: 500; }
 .tweak-radio { display: flex; gap: 4px; }
 .tweak-radio button {
-  flex: 1; padding: 5px 8px; font-size: 11px;
+  flex: 1; min-width: fit-content; padding: 5px 8px; font-size: 11px;
   border-radius: 6px; border: 1px solid var(--line);
   background: var(--bg-2); color: var(--fg-2);
   cursor: pointer; transition: all .12s; font-family: var(--sans);
