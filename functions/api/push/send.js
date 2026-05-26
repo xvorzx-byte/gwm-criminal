@@ -129,6 +129,8 @@ export async function onRequest(context) {
       if (res.ok || res.status === 201) { sent++; }
       else {
         failed++;
+        const errText = await res.text();
+        console.error(`Push failed [${res.status}]: ${errText} | endpoint: ${subscription.endpoint.slice(0,50)}`);
         if (res.status === 410 || res.status === 404) {
           await KV.delete(key.name);
         }
