@@ -2586,15 +2586,67 @@ input[type="file"] { display: none; }
         <div id="tw-schedule-status" style="font-size:10px;color:var(--fg-3);margin-top:4px"></div>
       </div>
 
-      <div class="tweak-section" id="tw-push-admin-section" style="display:none">
-        <div class="tweak-label">📢 ส่ง Push Notification</div>
-        <input id="tw-push-title" type="text" placeholder="หัวข้อ เช่น ⚔️ War เริ่มแล้ว!" maxlength="60"
-          style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans);margin-bottom:4px"/>
-        <textarea id="tw-push-msg" placeholder="ข้อความ เช่น เตรียมตัวเข้าสู้ได้เลย!" maxlength="120" rows="2"
-          style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg-1);color:var(--fg-0);font-size:12px;font-family:var(--sans);resize:none;margin-bottom:4px"></textarea>
-        <button onclick="sendPushNotification()" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:600">📡 ส่งหาทุกคน</button>
-        <div id="tw-push-send-status" style="font-size:10px;color:var(--fg-3);margin-top:4px;line-height:1.4"></div>
-      </div>
+      /* ── Push Message Templates ── */
+async function loadPushTemplates() {
+  const sel = document.getElementById('tw-push-tpl');
+  if (!sel) return;
+  try {
+    const res = await fetch('/api/push/schedule');
+    const data = await res.json();
+    const templates = data.msgTemplates || [];
+    sel.innerHTML = '<option value="">— เลือก Template —</option>' +
+      templates.map((t, i) => `<option value="${i}">${t.title}</option>`).join('');
+    sel._templates = templates;
+  } catch(e) {}
+}
+
+function applyPushTemplate(idx) {
+  const sel = document.getElementById('tw-push-tpl');
+  if (!sel || idx === '') return;
+  const t = (sel._templates || [])[parseInt(idx)];
+  if (!t) return;
+  document.getElementById('tw-push-title').value = t.title;
+  document.getElementById('tw-push-msg').value = t.message;
+}
+
+async function savePushTemplate() {
+  const title = document.getElementById('tw-push-title').value.trim();
+  const message = document.getElementById('tw-push-msg').value.trim();
+  const status = document.getElementById('tw-push-send-status');
+  if (!title || !message) {
+    status.textContent = '❌ กรอกหัวข้อและข้อความก่อน';
+    status.style.color = 'var(--err)';
+    return;
+  }
+  try {
+    const res = await fetch('/api/push/schedule');
+    const data = await res.json();
+    const templates = data.msgTemplates || [];
+    if (templates.find(t => t.title === title)) {
+      status.textContent = '⚠️ มี template ชื่อนี้แล้ว';
+      status.style.color = 'var(--warn)';
+      return;
+    }
+    templates.push({ title, message });
+    await fetch('/api/push/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ msgTemplates: templates })
+    });
+    status.textContent = '✅ บันทึก Template แล้ว';
+    status.style.color = 'var(--ok)';
+    await loadPushTemplates();
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--err)';
+  }
+}
+
+async function deletePushTemplate() {
+  const sel = document.getElementById('tw-push-tpl');
+  const status = document.getElementById('tw-push-send-status');
+  if (!sel || sel.value === '') {
+    status.textContent = '❌ เลือก Template ที่จะลบก่อน';
 
       <div class="tweak-section" id="tw-notif-test-section" style="display:none">
         <div class="tweak-label">Notification (Beta)</div>
@@ -7883,6 +7935,7 @@ async function syncWarDateToSchedule(warDate) {
 
 /* ── Auto Push Schedule UI ── */
 async function loadScheduleUI() {
+  loadPushTemplates();
   try {
     const res = await fetch('/api/push/schedule');
     const s = await res.json();
