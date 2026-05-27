@@ -4762,9 +4762,9 @@ function renderRoster(){
     const delBtn=canEdit?(z?`<button class="act-btn rb" onclick="rmZone('${z.id}','${m.id}')">✕</button>`:`<button class="act-btn rb" onclick="delRoster('${m.id}')">✕</button>`):'';
     const wh=m.warHistory||[];const wtotal=wh.length;const wready=wh.filter(r=>r==='ready'||r==='late').length;const wpct=wtotal>0?Math.round(wready/wtotal*100):-1;
     const rankImg=wpct<0?'':wpct>=90?'rank-gold':wpct>=75?'rank-diamond':wpct>=60?'rank-ruby':wpct>=40?'rank-rock':'rank-coal';
-    const rankIcon=rankImg?`<img src="/icons/${rankImg}.png" style="width:14px;height:14px;flex-shrink:0;object-fit:contain" title="${wpct}%"/>`:'';;
-    const zoneLabel=z?`<span style="font-size:8px;color:var(--gt3);flex-shrink:0;min-width:36px;text-align:right">${z.label.slice(0,6)}</span>`:`<span style="min-width:36px"></span>`;
-    return`<div class="ms ${a!=='ready'?a:''} ${m.error?'ms-err':''}"><div class="ms-info" onclick="${canEdit?`editM('${m.id}')`:''}"style="${canEdit?'':'cursor:default'}">${clsBadgeDot(m.cls,m.error)}<span class="mn" style="font-size:10px">${m.name}</span>${rankIcon}${m.cp>0?`<span class="cp-n">${fmtCP(m.cp)}</span>`:''}<span style="flex:1"></span>${zoneLabel}</div><div class="ms-acts">${editBtn}${delBtn}</div></div>`;
+    const rankIcon=rankImg?`<img src="/icons/${rankImg}.png" style="width:14px;height:14px;flex-shrink:0;object-fit:contain" title="${wpct}%"/>`:'';
+    const zoneLabel=z?`<span style="font-size:8px;color:var(--gt3);flex-shrink:0;white-space:nowrap">${z.label.slice(0,6)}</span>`:'';
+    return`<div class="ms ${a!=='ready'?a:''} ${m.error?'ms-err':''}"><div class="ms-info" onclick="${canEdit?`editM('${m.id}')`:''}"style="${canEdit?'':'cursor:default'}">${clsBadgeDot(m.cls,m.error)}<span class="mn" style="font-size:10px">${m.name}</span>${rankIcon}${m.cp>0?`<span class="cp-n">${fmtCP(m.cp)}</span>`:''}<span style="flex:1;min-width:8px"></span>${zoneLabel}</div><div class="ms-acts">${editBtn}${delBtn}</div></div>`;
   }).join('');
   const empty=filtered.length===0?`<div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--gt3)">${total===0?'ยังไม่มีสมาชิก':'ไม่พบสมาชิกที่ค้นหา'}</div>`:'';
   return`<div style="background:var(--gcard);border:1px solid var(--gbr);border-radius:10px;overflow:hidden">
