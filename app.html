@@ -2262,7 +2262,7 @@ input[type="file"] { display: none; }
 .ms.ms-err{border:1px solid #e53935;background:rgba(229,57,53,.08)}
 .ms.empty{border-style:dashed;border-color:var(--gbr2);opacity:.5;justify-content:center;color:var(--gt3);font-size:11px;cursor:pointer;padding:5px}
 .ms.empty:hover{opacity:.9;border-color:var(--gaccent);color:var(--gaccent)}
-.ms-info{display:grid;grid-template-columns:10px 1fr 52px 36px 36px;align-items:center;gap:4px;flex:1;min-width:0;cursor:pointer;}
+.ms-info{display:flex;align-items:center;gap:6px;flex:1;min-width:0;cursor:pointer;}
 .ms-inner{display:flex;flex-direction:column;gap:0;flex:1;min-width:0}
 .ms-note{display:block;font-size:9px;color:var(--accent);opacity:.95;white-space:normal;word-break:break-word;font-style:italic;line-height:1.3;margin-top:2px;width:100%}
 .ms-cp-warn{font-size:8px;color:#fb8c00;background:rgba(251,140,0,.15);padding:1px 4px;border-radius:3px;flex-shrink:0;border:1px solid rgba(251,140,0,.35)}
@@ -4762,9 +4762,9 @@ function renderRoster(){
     const delBtn=canEdit?(z?`<button class="act-btn rb" onclick="rmZone('${z.id}','${m.id}')">✕</button>`:`<button class="act-btn rb" onclick="delRoster('${m.id}')">✕</button>`):'';
     const wh=m.warHistory||[];const wtotal=wh.length;const wready=wh.filter(r=>r==='ready'||r==='late').length;const wpct=wtotal>0?Math.round(wready/wtotal*100):-1;
     const rankImg=wpct<0?'':wpct>=90?'rank-gold':wpct>=75?'rank-diamond':wpct>=60?'rank-ruby':wpct>=40?'rank-rock':'rank-coal';
-    const rankIcon=rankImg?`<img src="/icons/${rankImg}.png" style="width:14px;height:14px;flex-shrink:0;object-fit:contain" title="${wpct}%"/>`:'';
+    const rankIcon=rankImg?`<img src="/icons/${rankImg}.png" style="width:20px;height:20px;flex-shrink:0;object-fit:contain" title="${wpct}%"/>`:'';
     const zoneLabel=z?`<span style="font-size:8px;color:var(--gt3);flex-shrink:0;white-space:nowrap">${z.label.slice(0,6)}</span>`:'';
-    return`<div class="ms ${a!=='ready'?a:''} ${m.error?'ms-err':''}"><div class="ms-info" onclick="${canEdit?`editM('${m.id}')`:''}"style="${canEdit?'':'cursor:default'}">${clsBadgeDot(m.cls,m.error)}<span class="mn" style="font-size:10px">${m.name}</span>${rankIcon}${m.cp>0?`<span class="cp-n">${fmtCP(m.cp)}</span>`:''}<span style="flex:1;min-width:8px"></span>${zoneLabel}</div><div class="ms-acts">${editBtn}${delBtn}</div></div>`;
+    return`<div class="ms ${a!=='ready'?a:''} ${m.error?'ms-err':''}"><div class="ms-info" onclick="${canEdit?`editM('${m.id}')`:''}"style="${canEdit?'':'cursor:default'}"><span style="width:44px;flex-shrink:0">${clsBadgeDot(m.cls,m.error)}</span><span class="mn" style="font-size:10px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}</span><span style="width:24px;flex-shrink:0;display:flex;justify-content:center">${rankIcon}</span><span class="cp-n" style="width:36px;text-align:right;flex-shrink:0">${m.cp>0?fmtCP(m.cp):''}</span><span style="width:48px;flex-shrink:0;font-size:8px;color:var(--gt3);text-align:right">${z?z.label.slice(0,6):''}</span></div><div class="ms-acts">${editBtn}${delBtn}</div></div>`;
   }).join('');
   const empty=filtered.length===0?`<div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--gt3)">${total===0?'ยังไม่มีสมาชิก':'ไม่พบสมาชิกที่ค้นหา'}</div>`:'';
   return`<div style="background:var(--gcard);border:1px solid var(--gbr);border-radius:10px;overflow:hidden">
@@ -4781,7 +4781,7 @@ function renderRoster(){
       </div>
       <div style="display:flex;gap:5px;flex-wrap:wrap">${chips}</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px">${rows}${empty}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px;padding:8px">${rows}${empty}</div>
   </div>`;
 }
 function setRosterFilter(type,val){
