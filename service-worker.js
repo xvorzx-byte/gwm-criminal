@@ -2,7 +2,7 @@
 // Strategy: Network-first (always check for updates)
 // Version: bump this when deploying new version
 
-const CACHE_VERSION = 'gwm-v1.47';
+const CACHE_VERSION = 'gwm-v1.48';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 
 // Files to precache (essential for offline)
